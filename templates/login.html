@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+</head>
+<style>
+    .login{
+        text-align: center;
+    }
+</style>
+
+<body>
+
+<div class="login">
+    <h1>用户登录</h1>
+    <form action="/login/" method="post">
+        <p>
+            <label for="">用户名：</label>
+            <input type="text" placeholder="用户名" name="username">
+        </p>
+        <p>
+            <label for="">密码：</label>
+            <input type="password" placeholder="密码" name="userPassword">
+        </p>
+        <p>
+            <input type="submit" value="登录">
+            <input type="submit" value="注册">
+        </p>
+    </form>
+    <p style="color: red">
+        {{ error_msg }}
+    </p>
+</div>
+</body>
+</html>

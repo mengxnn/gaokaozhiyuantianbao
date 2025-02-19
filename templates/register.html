@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+</head>
+<body>
+    <h1>用户注册</h1>
+    <form action="/register/" method="post">
+        <p>
+            <label for="">邮箱</label>
+            <input type="email" name="userEmail">
+            <div style="color: red">{{ msg }}</div>
+        </p>
+        
+        <p>
+            <label for="">密码</label>
+            <input type="password" name="userPassword">
+        </p>
+        
+        <p>
+            <label for="">确认密码</label>
+            <input type="password" name="userRePassword">
+            <div style="color: red">{{ error_msg }}</div>
+        </p>
+        
+        <p>
+            <input type="submit" value="注册">
+        </p>
+        
+    </form>
+</body>
+</html>
