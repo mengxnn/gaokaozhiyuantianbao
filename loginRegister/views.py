@@ -10,11 +10,13 @@ def index(request):
 
 def register(request):
     if request.method=="POST":
+        userName = request.POST.get("userName")
         userEmail=request.POST.get('userEmail')
         userPassword=request.POST.get('userPassword')
         userRePassword=request.POST.get('userRePassword')
         try:  #数据库中已存在该用户
-            user=RegisterUser.objects.get(reg_mail=userEmail)
+            user=RegisterUser.objects.get(email=userEmail)
+            print(user)
             if user:
                 msg="用户名已存在"
                 return render(request,'register.html',{'msg':msg})
@@ -23,9 +25,7 @@ def register(request):
                 error_msg="密码不一致"
                 return render(request,'register.html',{'error_msg':error_msg})
             else:
-                register=RegisterUser(reg_mail=userEmail)
-                register.reg_mail=userEmail
-                register.reg_pwd=userPassword
+                register=RegisterUser(email=userEmail,password=userPassword)
                 register.save()
                 return redirect('/login/')
     else:
@@ -35,11 +35,11 @@ def login(request):
     if request.method=="GET":
         return render(request,'login.html')
     if request.method=="POST":
-        userEmail=request.POST.get('username')
-        userPassword=request.POST.get('userpassword')
+        userEmail=request.POST.get('userName')
+        userPassword=request.POST.get('userPassword')
         try:  #检查数据库中是否存在该用户
-            user=RegisterUser.objects.get(reg_mail=userEmail)
-            if userPassword==user.reg_pwd:  #密码正确，登录成功
+            user=RegisterUser.objects.get(email=userEmail)
+            if userPassword==user.password:  #密码正确，登录成功
                 return redirect('/index/')
             else:
                 error_msg="密码错误"

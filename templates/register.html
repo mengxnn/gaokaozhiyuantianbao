@@ -3,31 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <title>注册</title>
+    {% load static %}
+    <style>
+        body{
+            background-image: url("../static/img/landscape.jpg");
+            background-size: cover;
+        }
+        #main{
+            width: 480px;
+            height: 490px;
+            /*border: 1px solid #ff0000;*/
+            background-color: white;
+            opacity:0.8;  /*透明度 0-1*/
+            border-radius: 10px;
+            position: absolute;
+            right: 35%;
+            top: 15%;  /*到顶端的距离 0%为贴着顶端*/
+        }
+        h1{
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-left: 20px;
+        }
+        .login{
+            margin-left: 20px;
+            color:silver;
+            font-size: 10px;
+        }
+        a{
+            text-decoration: none;/*去掉文本线*/
+        }
+        #user{
+            margin-top: 30px;
+        }
+        .p1{
+            line-height: 50px;
+            text-align: center;
+        }
+        .p2{
+            {#line-height: 25px;#}
+            text-align: center;
+        }
+        .inp0{
+            width: 360px;
+            height: 40px;
+            border-radius: 5px;
+            background-color: aliceblue;
+            border: 1px solid white;
+            outline: none;/*获得焦点时无任何显示*/
+            text-indent: 1em;/*缩进*/
+            font-size: 10px;
+        }
+
+        .register{
+            width: 420px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid white;
+            background-color: skyblue;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }  
+    </style>
 </head>
 <body>
-    <h1>用户注册</h1>
-    <form action="/register/" method="post">
-        <p>
-            <label for="">邮箱</label>
-            <input type="email" name="userEmail">
-            <div style="color: red">{{ msg }}</div>
-        </p>
-        
-        <p>
-            <label for="">密码</label>
-            <input type="password" name="userPassword">
-        </p>
-        
-        <p>
-            <label for="">确认密码</label>
-            <input type="password" name="userRePassword">
-            <div style="color: red">{{ error_msg }}</div>
-        </p>
-        
-        <p>
-            <input type="submit" value="注册">
-        </p>
-        
-    </form>
+    <div id="main">
+        <h1>欢迎注册</h1>
+        <p class="login">已有账号？<a href="/login">登录</a><a>|</a><a href="/index">返回首页</a></p>
+        <form action="/register/" method="post">
+            <p class="p1">
+                用户名<input type="text" name="userName" placeholder="请输入用户名" class="inp0">
+            </p>
+            <p class="p1">
+                <label for="">邮箱</label>
+                <input type="email" name="userEmail" placeholder="请输入邮箱" class="inp0">
+            </p>
+            
+            <p class="p1">
+                <label for="">密码</label>
+                <input type="password" name="userPassword" placeholder="请输入密码" class="inp0">
+            </p>
+            
+            <p class="p1">
+                <label for="">确认密码</label>
+                <input type="password" name="userRePassword" placeholder="请确认密码" class="inp0">
+                <div style="color: red">{{ error_msg }}</div>
+            </p>
+            
+            <p class="p1">
+                <button type="submit" class="register">注册</button>
+            </p>
+            <p class="p2" style="color: red">
+                {{ msg }}
+            </p>
+        </form>
+    </div>
 </body>
+
 </html>
