@@ -14,17 +14,29 @@ def register(request):
         userEmail=request.POST.get('userEmail')
         userPassword=request.POST.get('userPassword')
         userRePassword=request.POST.get('userRePassword')
+
+        # 检查字段是否为空
+        if not userName:
+            error_msg = "用户名不能为空"
+            return render(request, 'register.html', {'error_msg': error_msg})
+        if not userEmail:
+            error_msg = "邮箱不能为空"
+            return render(request, 'register.html', {'error_msg': error_msg})
+        if not userPassword:
+            error_msg = "密码不能为空"
+            return render(request, 'register.html', {'error_msg': error_msg})
+
         try:
             # 检查邮箱是否已存在
             Email = RegisterUser.objects.get(email=userEmail)
-            msg = "邮箱已被注册"
-            return render(request, 'register.html', {'msg': msg})
+            error_msg = "邮箱已被注册"
+            return render(request, 'register.html', {'error_msg': error_msg})
         except RegisterUser.DoesNotExist:
             # 如果邮箱不存在，继续检查用户名
             try:
                 name = RegisterUser.objects.get(username=userName)
-                msg = "用户名已存在"
-                return render(request, 'register.html', {'msg': msg})
+                error_msg = "用户名已存在"
+                return render(request, 'register.html', {'error_msg': error_msg})
             except RegisterUser.DoesNotExist:
                 # 两者都不存在，允许注册
                 if userPassword != userRePassword:
