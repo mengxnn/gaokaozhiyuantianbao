@@ -14,36 +14,44 @@ def register(request):
         userEmail=request.POST.get('userEmail')
         userPassword=request.POST.get('userPassword')
         userRePassword=request.POST.get('userRePassword')
-        try:  #数据库中已存在该用户
-            user=RegisterUser.objects.get(email=userEmail)
-            print(user)
-            if user:
-                msg="用户名已存在"
-                return render(request,'register.html',{'msg':msg})
-        except:  #数据库中不存在该用户，允许注册
-            if userPassword!=userRePassword:  #检查密码和确认密码是否一致
-                error_msg="密码不一致"
-                return render(request,'register.html',{'error_msg':error_msg})
-            else:
-                register=RegisterUser(email=userEmail,password=userPassword)
-                register.save()
-                return redirect('/login/')
+        try:
+            # 检查邮箱是否已存在
+            Email = RegisterUser.objects.get(email=userEmail)
+            msg = "邮箱已被注册"
+            return render(request, 'register.html', {'msg': msg})
+        except RegisterUser.DoesNotExist:
+            # 如果邮箱不存在，继续检查用户名
+            try:
+                name = RegisterUser.objects.get(username=userName)
+                msg = "用户名已存在"
+                return render(request, 'register.html', {'msg': msg})
+            except RegisterUser.DoesNotExist:
+                # 两者都不存在，允许注册
+                if userPassword != userRePassword:
+                    error_msg = "两次密码不一致"
+                    return render(request, 'register.html', {'error_msg': error_msg})
+                else:
+                    register = RegisterUser(email=userEmail, password=userPassword, username=userName)
+                    register.save()
+                    return redirect('/login/')
     else:
         return render(request,'register.html')
 
 def login(request):
-    if request.method=="GET":
-        return render(request,'login.html')
     if request.method=="POST":
-        userEmail=request.POST.get('userName')
+        userName=request.POST.get("userName")
+        # userEmail=request.POST.get('userName')
         userPassword=request.POST.get('userPassword')
         try:  #检查数据库中是否存在该用户
-            user=RegisterUser.objects.get(email=userEmail)
+            # Email=RegisterUser.objects.get(email=userEmail)
+            user=RegisterUser.objects.get(username=userName)  #使用用户名和密码验证登录
             if userPassword==user.password:  #密码正确，登录成功
                 return redirect('/index/')
             else:
                 error_msg="密码错误"
                 return render(request,'login.html',{'error_msg':error_msg})
-        except:  #数据库中不存在该用户
+        except RegisterUser.DoesNotExist:  #数据库中不存在该用户
             error_msg="用户名不存在"
             return render(request,'login.html',{'error_msg':error_msg})
+    else:
+        return render(request, 'login.html')
