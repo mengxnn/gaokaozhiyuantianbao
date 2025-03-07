@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>志愿填报</title>
-    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/bootstrap-3.3.7-dist/css/bootstrap.css">
 </head>
 <body>
+    <script src="../static/bootstrap-3.3.7-dist/css/bootstrap.css"></script>
+    <script src="../static/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+
+
     <div class="container">
         <h2>填写信息</h2>
         <form method="POST">
@@ -28,18 +32,20 @@
                 <input type="text" class="form-control" id="subject" name="subject" required>
             </div>
             
-            <!-- Single button -->
+            <!-- Split button -->
             <div class="btn-group">
-                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Action <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a href="#">Separated link</a></li>
-                  </ul>
+              <button type="button" class="btn btn-danger">Action</button>
+              <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">Separated link</a></li>
+              </ul>
             </div>
             
             <button type="submit" class="btn btn-primary">提交</button>
