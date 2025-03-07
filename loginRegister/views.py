@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 from loginRegister.models import RegisterUser
 from django.shortcuts import redirect
@@ -67,3 +68,18 @@ def login(request):
             return render(request,'login.html',{'error_msg':error_msg})
     else:
         return render(request, 'login.html')
+
+
+def volunteer_form(request):
+    if request.method == 'POST':
+        # 获取表单数据
+        province = request.POST.get('province')
+        score = request.POST.get('score')
+        rank = request.POST.get('rank')
+        subject = request.POST.get('subject')
+
+        # 可以在此处添加处理逻辑，例如保存到数据库或执行一些计算
+        return HttpResponse(f"您选择的省份是 {province}, 分数是 {score}, 排名是 {rank}, 选科是 {subject}.")
+
+    # GET 请求时返回填报表单
+    return render(request, 'input_info.html')

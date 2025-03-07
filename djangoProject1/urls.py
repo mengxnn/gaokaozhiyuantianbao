@@ -18,9 +18,11 @@ from django.contrib import admin
 from django.urls import path
 from loginRegister import views
 
+#添加网页时要在这里添加对应的path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('index/', views.index),
     path('register/', views.register),
     path('login/', views.login),
+    path('volunteer_form/', views.volunteer_form, name='volunteer_form'),
 ]

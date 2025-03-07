@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>志愿填报</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+</head>
+<body>
+    <div class="container">
+        <h2>填写信息</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="province">省份:</label>
+                <input type="text" class="form-control" id="province" name="province" required>
+                <!--required属性会在表单内容为空时提示用户填写该字段-->
+            </div>
+            <div class="form-group">
+                <label for="score">分数:</label>
+                <input type="number" class="form-control" id="score" name="score" required>
+            </div>
+            <div class="form-group">
+                <label for="rank">排名:</label>
+                <input type="number" class="form-control" id="rank" name="rank" required>
+            </div>
+            <div class="form-group">
+                <label for="subject">选科:</label>
+                <input type="text" class="form-control" id="subject" name="subject" required>
+            </div>
+            
+            <!-- Single button -->
+            <div class="btn-group">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Action <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#">Separated link</a></li>
+                  </ul>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">提交</button>
+        </form>
+    </div>
+</body>
+</html>

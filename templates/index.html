@@ -2,9 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>登录成功</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="../static/css/mycss.css">
 </head>
 <body>
-    <h1>{{ login_msg }}</h1>
+    <script src="../static/js/jquery-3.2.1.js"></script>
+    <script src="../static/js/bootstrap.js"></script>
+    
+    
+    <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Brand</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#">欢迎使用</a></li>
+          <li><a href="#" >各省份分数表</a></li>
+          <li><a href="#" >智能分析</a></li>
+          <li><a href="#" >985高校地图</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+        
+   
+        
+</nav>
+
+    <div class="btn-group" role="group" aria-label="...">
+        <a href="{% url 'volunteer_form' %}" class="btn btn-default">开始</a>
+{#  <button type="button" class="btn btn-default">Middle</button>#}
+{#  <button type="button" class="btn btn-default">Right</button>#}
+    </div>
+
 </body>
 </html>
