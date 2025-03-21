@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>推荐高校</title>
+    <link rel="stylesheet" href="../static/bootstrap-3.3.7-dist/css/bootstrap.css">
+</head>
+<body>
+    <div class="container">
+        <h2>推荐的高校和专业</h2>
+
+        {% if universities %}
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>高校名称</th>
+                        <th>专业</th>
+                        <th>省份</th>
+                        <th>平均分</th>
+                        <th>选科要求</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for university in universities %}
+                        <tr>
+                            <td>{{ university.school_name }}</td>
+                            <td>{{ university.major }}</td>
+                            <td>{{ university.province }}</td>
+                            <td>{{ university.avg_score }}</td>
+                            <td>{{ university.sub_req }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>没有找到符合条件的高校。</p>
+        {% endif %}
+    </div>
+</body>
+</html>

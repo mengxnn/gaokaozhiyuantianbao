@@ -87,6 +87,30 @@
             setupDropdown("subject2-menu", "subject2-btn", "subject2");
             setupDropdown("subject3-menu", "subject3-btn", "subject3");
         });
+        
+        // 前端校验重复选科
+        function checkDuplicateSubjects() {
+            var sub1 = document.getElementById('subject1').value;
+            var sub2 = document.getElementById('subject2').value;
+            var sub3 = document.getElementById('subject3').value;
+            
+            if(sub1 === "" || sub2 === "" || sub3 === ""){
+                alert("请选择所有的科目！");
+                return false;
+            }
+            
+            if (sub1 === sub2 || sub1 === sub3 || sub2 === sub3) {
+                alert("请不要选择重复的科目！");
+                return false;
+            }
+            return true;
+        }
+
+        document.querySelector("form").addEventListener("submit", function(e) {
+            if (!checkDuplicateSubjects()) {
+                e.preventDefault();
+            }
+        });
     </script>
 
 </body>
