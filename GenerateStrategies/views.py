@@ -2,7 +2,7 @@ from django.shortcuts import render
 import pymysql
 import pandas as pd
 
-# **数据库连接信息**（请替换成你的数据库信息）
+# 数据库连接信息
 DB_CONFIG = {
     'host': 'localhost',  # 数据库地址（本地/远程）
     'user': 'root',  # 数据库用户名
@@ -14,7 +14,7 @@ DB_CONFIG = {
 
 def input_info(request):
     if request.method == 'POST':
-        # **获取用户的输入数据**
+        # 获取用户的输入数据
         user_score = int(request.POST.get('score'))  # 确保用户分数是整数
         user_rank = int(request.POST.get('rank'))
         user_province = request.POST.get('province')
@@ -24,10 +24,10 @@ def input_info(request):
         connection = pymysql.connect(**DB_CONFIG)
         cursor = connection.cursor()
 
-        # **SQL 查询：获取 2021-2023 年数据，并计算各专业的平均分**
+        # SQL 查询：获取 2021-2023 年数据，并计算各专业的平均分
         query = """
-            SELECT school_name, major, province, ROUND(AVG(min_score),2) AS avg_score, sub_req
-            FROM `2021-2023湖南省招生情况`
+            SELECT school_name, major, province, ROUND(AVG(min_score),2) AS avg_score, sub_req, is985, is211, isdoubleFC
+            FROM `2021-2023湖南省招生情况` NATURAL JOIN `院校信息`
             WHERE year IN (2021, 2022, 2023)
             GROUP BY school_name, major, province, sub_req
             ORDER BY avg_score DESC;
@@ -35,15 +35,15 @@ def input_info(request):
         cursor.execute(query)
         data = cursor.fetchall()
 
-        # **转换为 Pandas DataFrame**
-        df = pd.DataFrame(data, columns=['school_name', 'major', 'province', 'avg_score', 'sub_req'])
+        # 转换为 Pandas DataFrame
+        df = pd.DataFrame(data, columns=['school_name', 'major', 'province', 'avg_score', 'sub_req', 'is985', 'is211', 'isdoubleFC'])
 
-        # **筛选满足分数要求的高校**
+        # 筛选满足分数要求的高校
         recommended_schools = df[
             (df['avg_score'] >= (user_score - 60)) & (df['avg_score'] <= (user_score + 20))
         ]
 
-        # **筛选符合选科要求的专业**
+        # 筛选符合选科要求的专业
         def filter_by_subject(row, selected_subjects):
             sub_req = row['sub_req']
             #print(sub_req)
@@ -63,7 +63,7 @@ def input_info(request):
 
             return True
 
-        # **应用选科筛选**
+        # 应用选科筛选
         recommended_schools = recommended_schools[recommended_schools.apply(
             lambda row: filter_by_subject(row, user_subjects), axis=1
         )]
@@ -72,7 +72,7 @@ def input_info(request):
         cursor.close()
         connection.close()
 
-        # **返回推荐的高校**
+        # 返回推荐的高校
         return render(request, 'recommendations.html', {
             'universities': recommended_schools.to_dict(orient='records')
         })

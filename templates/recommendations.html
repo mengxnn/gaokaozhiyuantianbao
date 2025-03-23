@@ -18,6 +18,9 @@
                         <th>省份</th>
                         <th>平均分</th>
                         <th>选科要求</th>
+                        <th>是否是985</th>
+                        <th>是否是211</th>
+                        <th>是否是双一流</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -28,6 +31,9 @@
                             <td>{{ university.province }}</td>
                             <td>{{ university.avg_score }}</td>
                             <td>{{ university.sub_req }}</td>
+                            <td>{{ university.is985 }}</td>
+                            <td>{{ university.is211 }}</td>
+                            <td>{{ university.isdoubleFC }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
