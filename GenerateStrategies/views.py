@@ -26,7 +26,7 @@ def input_info(request):
 
         # SQL 查询：获取 2021-2023 年数据，并计算各专业的平均分
         query = """
-            SELECT school_name, major, province, ROUND(AVG(min_score),2) AS avg_score, sub_req, is985, is211, isdoubleFC
+            SELECT school_name, major, province, ROUND(AVG(min_score),2) AS avg_score, ROUND(AVG(lowest_rank),2) AS avg_rank, sub_req, is985, is211, isdoubleFC
             FROM `2021-2023湖南省招生情况` NATURAL JOIN `院校信息`
             WHERE year IN (2021, 2022, 2023)
             GROUP BY school_name, major, province, sub_req
@@ -36,7 +36,7 @@ def input_info(request):
         data = cursor.fetchall()
 
         # 转换为 Pandas DataFrame
-        df = pd.DataFrame(data, columns=['school_name', 'major', 'province', 'avg_score', 'sub_req', 'is985', 'is211', 'isdoubleFC'])
+        df = pd.DataFrame(data, columns=['school_name', 'major', 'province', 'avg_score', 'avg_rank', 'sub_req', 'is985', 'is211', 'isdoubleFC'])
 
         # 筛选满足分数要求的高校
         recommended_schools = df[
@@ -72,9 +72,16 @@ def input_info(request):
         cursor.close()
         connection.close()
 
+        # 按学校进行分组，确保每个学校显示多个专业
+        grouped_schools = recommended_schools.groupby('school_name').apply(
+            lambda x: x.to_dict(orient='records')).reset_index()
+        print(grouped_schools)
+        # 转换为列表形式，方便模板使用
+        grouped_schools = grouped_schools[['school_name', 0]].to_dict(orient='records')
+        #print(grouped_schools)
         # 返回推荐的高校
         return render(request, 'recommendations.html', {
-            'universities': recommended_schools.to_dict(orient='records')
+            'grouped_schools': grouped_schools
         })
 
     return render(request, 'input_info.html')
