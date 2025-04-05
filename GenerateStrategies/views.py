@@ -38,6 +38,10 @@ def input_info(request):
         # 转换为 Pandas DataFrame
         df = pd.DataFrame(data, columns=['school_name', 'major', 'province', 'avg_score', 'avg_rank', 'sub_req', 'is985', 'is211', 'isdoubleFC'])
 
+        #添加分数和排名差距
+        df['score_diff'] = df['avg_score'] - user_score
+        df['rank_diff'] = df['avg_rank'] - user_rank
+
         # 筛选满足分数要求的高校
         recommended_schools = df[
             (df['avg_score'] >= (user_score - 60)) & (df['avg_score'] <= (user_score + 20))
@@ -75,7 +79,7 @@ def input_info(request):
         # 按学校进行分组，确保每个学校显示多个专业
         grouped_schools = recommended_schools.groupby('school_name').apply(
             lambda x: x.to_dict(orient='records')).reset_index()
-        print(grouped_schools)
+        #print(grouped_schools)
         # 转换为列表形式，方便模板使用
         grouped_schools = grouped_schools[['school_name', 0]].to_dict(orient='records')
         #print(grouped_schools)

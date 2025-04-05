@@ -45,8 +45,22 @@
                                     <tr>
                                         <td>{{ major.major }}</td>
                                         <td>{{ major.province }}</td>
-                                        <td>{{ major.avg_score }}</td>
-                                        <td>{{ major.avg_rank }}</td>
+                                        <td>
+                                            {{ major.avg_score }}
+                                            {% if major.score_diff > 0 %}
+                                                <span style="color:red;">+{{ major.score_diff }}</span>
+                                            {% else %}
+                                                <span style="color:green;">{{ major.score_diff }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ major.avg_rank }}
+                                            {% if major.rank_diff > 0 %}
+                                                <span style="color:green;">+{{ major.rank_diff }}</span>
+                                            {% else %}
+                                                <span style="color:red;">{{ major.rank_diff }}</span>
+                                            {% endif %}
+                                        </td>
                                         <td>{{ major.sub_req }}</td>
                                     </tr>
                                     {% endfor %}
