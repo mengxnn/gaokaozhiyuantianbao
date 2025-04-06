@@ -1,48 +1,162 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="../static/bootstrap-3.3.7-dist/css/bootstrap.css">
-    <link rel="../static/css/mycss.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>高考志愿智能填报系统</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/mycss.css">
+    <script src="../static/js/jquery-3.2.1.js"></script>
+    <script src="../static/js/bootstrap.js"></script>
+    <style>
+        .jumbotron {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            margin-top: 70px;
+        }
+        .feature-box {
+            padding: 30px;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+        .feature-box:hover {
+            transform: translateY(-5px);
+        }
+        .start-btn {
+            font-size: 24px;
+            padding: 20px 40px;
+            border-radius: 30px;
+            margin: 30px 0;
+        }
+        .university-logo {
+            height: 60px;
+            margin: 15px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        .university-logo:hover {
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
-    <script src="../static/bootstrap-3.3.7-dist/css/bootstrap.css"></script>
-    <script src="../static/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
     
-    
-    <nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="#">Brand</a>
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="sr-only">导航</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-graduation-cap"></i> 高考志愿通
+                </a>
+            </div>
+            
+            <div class="collapse navbar-collapse" id="navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="#"><i class="fas fa-home"></i>
+                        <div class="p2">首页</div>
+                    </a></li>
+                    <li><a href="#"><i class="fas fa-table"></i> 各省分数线</a></li>
+                    <li><a href="#"><i class="fas fa-chart-line"></i> 智能分析</a></li>
+                    <li><a href="#"><i class="fas fa-map-marked-alt"></i> 高校地图</a></li>
+                    <li><a href="#"><i class="fas fa-book-open"></i> 专业百科</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 首页大图 -->
+        <div class="jumbotron text-center">
+            <h1>高考志愿智能填报系统</h1>
+            <p class="lead">基于百万级数据，为您提供精准志愿推荐服务</p>
+            <div class="btn-group">
+                <a href="{% url 'input_info' %}" class="btn btn-success btn-lg start-btn">
+                    <i class="fas fa-play-circle"></i> 立即开始
+                </a>
+            </div>
+        </div>
+
+        <!-- 核心功能 -->
+        <div class="row text-center">
+            <div class="col-md-3 col-sm-6">
+                <div class="feature-box bg-primary">
+                    <i class="fas fa-robot fa-3x"></i>
+                    <h3>智能推荐</h3>
+                    <p>根据分数自动匹配适合院校</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="feature-box bg-info">
+                    <i class="fas fa-database fa-3x"></i>
+                    <h3>数据权威</h3>
+                    <p>覆盖全国3000+高校录取数据</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="feature-box bg-warning">
+                    <i class="fas fa-chart-pie fa-3x"></i>
+                    <h3>多维分析</h3>
+                    <p>院校/专业/就业深度解析</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="feature-box bg-danger">
+                    <i class="fas fa-clock fa-3x"></i>
+                    <h3>实时更新</h3>
+                    <p>最新招生政策及时同步</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 热门院校 -->
+        <div class="row" style="margin: 50px 0">
+            <div class="col-md-12 text-center">
+                <h2><i class="fas fa-university"></i> 热门推荐院校</h2>
+                <div class="scroll-box">
+                    <img src="../static/img/湖南大学.jpg" class="university-logo">
+                    <img src="../static/img/武汉大学.jpg" class="university-logo">
+                    <img src="../static/images/zju.png" class="university-logo">
+                    <img src="../static/images/fudan.png" class="university-logo">
+                    <img src="../static/images/sjtu.png" class="university-logo">
+                </div>
+{#                <span class="ellipsis color333">湖南大学</span>#}
+            </div>
+        </div>
     </div>
 
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li><a href="#">欢迎使用</a></li>
-          <li><a href="#" >各省份分数表</a></li>
-          <li><a href="#" >智能分析</a></li>
-          <li><a href="#" >985高校地图</a></li>
-      </ul>
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
-        
-   
-        
-</nav>
-
-    <div class="btn-group" role="group" aria-label="...">
-        <a href="{% url 'input_info' %}" class="btn btn-default">开始</a>
-{#  <button type="button" class="btn btn-default">Middle</button>#}
-{#  <button type="button" class="btn btn-default">Right</button>#}
-    </div>
+    <!-- 页脚 -->
+    <footer class="bg-dark text-light" style="padding: 30px 0">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>联系我们</h4>
+                    <p>客服电话：400-123-4567</p>
+                    <p>服务时间：9:00-21:00</p>
+                </div>
+                <div class="col-md-4">
+                    <h4>合作伙伴</h4>
+                    <p>教育部阳光高考平台</p>
+                    <p>中国教育在线</p>
+                </div>
+                <div class="col-md-4">
+                    <h4>关注我们</h4>
+                    <p>
+                        <i class="fab fa-weixin fa-2x"></i>
+                        <i class="fab fa-weibo fa-2x"></i>
+                        <i class="fab fa-qq fa-2x"></i>
+                    </p>
+                </div>
+            </div>
+            <div class="text-center" style="margin-top: 20px">
+                <p>&copy; 2023 高考志愿通 版权所有</p>
+            </div>
+        </div>
+    </footer>
 
 </body>
 </html>

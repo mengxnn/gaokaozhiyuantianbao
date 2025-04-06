@@ -1,0 +1,17 @@
+.p1{
+display: flex;
+justify-content: space-between;
+height: 35px;
+}
+
+.p2{
+    color: #ff6602;
+    position: relative;
+}
+
+.p3{
+    position: relative;
+    height: 100%;
+    font-size: 18px;
+    transition: all .15s;
+}
