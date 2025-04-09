@@ -9,6 +9,9 @@ def index(request):
     login_msg="恭喜！登录成功"
     return render(request,'index.html',{'login_msg':login_msg})
 
+def map(request):
+    return render(request,'map.html')
+
 def register(request):
     if request.method=="POST":
         userName = request.POST.get("userName")

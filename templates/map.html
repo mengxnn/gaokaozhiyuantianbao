@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Province visualization</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- web fonts -->
+    <link href="http://fonts.googleapis.com/css?family=Poppins:100,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Hind&display=swap" rel="stylesheet">
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="../static/css/style-starter.css">
+    <link rel="stylesheet" href="../static/css/humborn.css">
+</head>
+
+<body>
+    <section class="w3l-bootstrap-header">
+        <nav class="navbar navbar-expand-lg navbar-light py-lg-2 py-2">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">高考志愿通</a>
+                <!-- if logo is image enable this   
+  <a class="navbar-brand" href="#index.html">
+      <img src="image-path" alt="Your logo" title="Your logo" style="height:35px;" />
+  </a> -->
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon fa fa-bars"></span>
+    </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/index">主页</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">各省份分数线</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">智能分析</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">高校地图</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">专业百科</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </section>
+
+    <section class="w3l-about-breadcrum">
+        <div class="breadcrum-bg py-sm-5 py-4">
+            <div class="container py-lg-3 py-2">
+                <h1>中国各省大学分布图</h1>
+            </div>
+        </div>
+    </section>
+    <section class="mainbox">
+        <div class="map"></div>
+        <div class="chart"></div>
+    </section>
+    
+    <section class="w3l-footer-29-main">
+        <div class="footer-29">
+            <div class="container">
+                <div class="d-grid grid-col-4 footer-top-29">
+                    <div class="footer-list-29 footer-1">
+                        <h6 class="footer-title-29">Contact Us</h6>
+                        <ul>
+                            <li>
+                                <a href="info.html" span class="fa fa-map-marker"></span> Gaokaozhiyuantong, HNU</a>
+                            </li>
+                            <li><a href="mengxn@hnu.edu.cn" class="mail"><span class="fa fa-envelope-open-o"></span> mengxn@hnu.edu.cn</a></li>
+                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- move top -->
+        <button onclick="topFunction()" id="movetop" title="Go to top" style="display: block;">
+            <span class="fa fa-angle-up"></span>
+        </button>
+            <script>
+                // When the user scrolls down 20px from the top of the document, show the button
+                window.onscroll = function() {
+                    scrollFunction()
+                };
+
+                function scrollFunction() {
+                    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                        document.getElementById("movetop").style.display = "block";
+                    } else {
+                        document.getElementById("movetop").style.display = "none";
+                    }
+                }
+
+                // When the user clicks on the button, scroll to the top of the document
+                function topFunction() {
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+                }
+            </script>
+            <!-- /move top -->
+    <script>
+        $(function() {
+            $('.navbar-toggler').click(function() {
+                $('body').toggleClass('noscroll');
+            })
+        });
+    </script>
+
+    <!-- Template JavaScript -->
+    <script src="../static/js/owl.carousel.js"></script>
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap.js"></script>
+    <script src="../static/js/jquery-3.2.1.js"></script>
+    
+    <script src="../static/js/echarts.js"></script>
+    <!--地图和右侧柱状图-->
+    <script src="../static/js/china.js"></script>
+    <script src="../static/js/map.js" type="text/javascript"></script>
+    <script src="../static/js/statisticChart.js" type="text/javascript"></script>
+
+    <!-- script for -->
+    <script>
+        $(document).ready(function() {
+            $('.owl-one').owlCarousel({
+                loop: true,
+                margin: 0,
+                nav: true,
+                responsiveClass: true,
+                autoplay: false,
+                autoplayTimeout: 5000,
+                autoplaySpeed: 1000,
+                autoplayHoverPause: false,
+                responsive: {
+                    0: {
+                        items: 1,
+                        nav: false
+                    },
+                    480: {
+                        items: 1,
+                        nav: false
+                    },
+                    667: {
+                        items: 1,
+                        nav: true
+                    },
+                    1000: {
+                        items: 1,
+                        nav: true
+                    }
+                }
+            })
+        })
+    </script>
+    <!-- //script -->
+
+</body>
+
+</html>

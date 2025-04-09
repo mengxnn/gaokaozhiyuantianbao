@@ -27,7 +27,7 @@ def input_info(request):
         # SQL 查询：获取 2021-2023 年数据，并计算各专业的平均分
         query = """
             SELECT school_name, major, province, ROUND(AVG(min_score),2) AS avg_score, ROUND(AVG(lowest_rank),2) AS avg_rank, sub_req, is985, is211, isdoubleFC
-            FROM `2021-2023湖南省招生情况` NATURAL JOIN `院校信息`
+            FROM `2021-2023湖南省招生情况` NATURAL JOIN `所有院校信息`
             WHERE year IN (2021, 2022, 2023)
             GROUP BY school_name, major, province, sub_req
             ORDER BY avg_score DESC;

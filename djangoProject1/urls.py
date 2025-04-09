@@ -25,5 +25,6 @@ urlpatterns = [
     path('index/', views.index),
     path('register/', views.register),
     path('login/', views.login),
+    path('', include('loginRegister.urls')),  # 包括 loginRegister 应用的 URL 路由
     path('GenerateStrategies/', include('GenerateStrategies.urls')),  # 包括 GenerateStrategies 应用的 URL 路由
 ]
