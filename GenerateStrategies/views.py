@@ -1,6 +1,7 @@
 from django.shortcuts import render
 import pymysql
 import pandas as pd
+from django.http import JsonResponse
 
 # 数据库连接信息
 DB_CONFIG = {
@@ -11,6 +12,38 @@ DB_CONFIG = {
     'charset': 'utf8mb4',  # 设定编码，防止中文乱码
 }
 
+
+def get_rank(request):
+    if request.method == 'POST':
+        province = request.POST.get('province')
+        score = int(request.POST.get('score'))
+        subject1 = request.POST.get('subject1')  # 获取物理/历史
+        year = 2024  # 使用最新年份数据
+
+        connection = pymysql.connect(**DB_CONFIG)
+        try:
+            with connection.cursor() as cursor:
+                # 查询大于等于该分数的最小累计排名
+                query = """
+                SELECT tot_num 
+                FROM `一分一段表`
+                WHERE province = %s 
+                    AND year = %s 
+                    AND subject1 = %s
+                    AND score <= %s
+                ORDER BY score DESC 
+                LIMIT 1
+                """
+                cursor.execute(query, (province, year, f"{subject1}类", score))
+                result = cursor.fetchone()
+                return JsonResponse({'rank': result[0] if result else None})
+
+        except Exception as e:
+            print(f"数据库查询异常：{str(e)}")
+            return JsonResponse({'error': '服务器内部错误'}, status=500)
+        finally:
+            if connection:
+                connection.close()
 
 def input_info(request):
     if request.method == 'POST':

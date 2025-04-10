@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="../static/css/bootstrap.css">
     <script src="../static/js/jquery-3.2.1.js"></script>
     <script src="../static/js/bootstrap.js"></script>
+    <script src="../static/js/lodash.js"></script>
 </head>
 <body>
     <div class="container">
@@ -16,15 +17,7 @@
                 <label for="province">省份:</label>
                 <input type="text" class="form-control" id="province" name="province" required>
             </div>
-            <div class="form-group">
-                <label for="score">分数:</label>
-                <input type="number" class="form-control" id="score" name="score" required>
-            </div>
-            <div class="form-group">
-                <label for="rank">排名:</label>
-                <input type="number" class="form-control" id="rank" name="rank" required>
-            </div>
-
+            
             <!-- 选科部分 -->
             <div class="form-group">
                 <label>选科:</label>
@@ -67,11 +60,23 @@
                 <input type="hidden" id="subject2" name="subject2">
                 <input type="hidden" id="subject3" name="subject3">
             </div>
+            
+            <div class="form-group">
+                <label for="score">分数:</label>
+                <input type="number" class="form-control" id="score" name="score" required>
+            </div>
+            <div class="form-group">
+                <label for="rank">排名:</label>
+                <input type="number" class="form-control" id="rank" name="rank" required>
+            </div>
+
+            
 
             <button type="submit" class="btn btn-primary">提交</button>
         </form>
     </div>
-
+    
+    <!--处理选科 -->
     <script>
         // 处理选科按钮点击事件
         function setupDropdown(menuId, btnId, inputId) {
@@ -110,6 +115,80 @@
             if (!checkDuplicateSubjects()) {
                 e.preventDefault();
             }
+        });
+        
+    </script>
+    
+    <!-- 修改科目1的点击事件处理 -->
+    <script>
+    function setupDropdown(menuId, btnId, inputId) {
+        $("#" + menuId + " li a").click(function () {
+            let selectedText = $(this).text();
+            $("#" + btnId).text(selectedText + " ").append('<span class="caret"></span>');
+            $("#" + inputId).val(selectedText);
+            // 触发排名重新计算
+            $('#subject1').trigger('change');
+        });
+    }
+    </script>
+    
+    <!--自动获取排名 -->
+    <script>
+        // 自动获取排名功能
+        function fetchRank() {
+            const province = $('#province').val();
+            const score = $('#score').val();
+            const subject1 = $('#subject1').val(); // 获取物理/历史
+            
+            // 清除旧数据
+            $('#rank').val('');
+            
+            if (!province || !score || !subject1) {
+                $('#rank').prop('disabled', false);
+                return;
+            }
+            
+            $('#rank').prop('disabled', true).attr('placeholder', '计算中...');
+            
+            $.ajax({
+                url: '/GenerateStrategies/get_rank/',  // 后端处理排名的路径
+                method: 'POST',
+                data: {
+                    'province': province,
+                    'score': score,
+                    'subject1': subject1,
+                    'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(response) {
+                    if (response.rank) {
+                        $('#rank').val(response.rank);  // 填充排名
+                    } else {
+                        alert('未找到该省份的分数段数据');
+                    }
+                },
+                error: function(xhr) {
+                    let msg = xhr.status === 400 ? '参数错误' : '服务不可用';
+                    alert(`获取排名失败（${msg}），请手动输入`);
+                },
+                beforeSend: function() {
+                    $('#rank').css('background', '#fff8e1');
+                },
+                complete: function() {
+                    $('#rank').css('background', 'white');
+                    $('#rank').prop('disabled', false);
+                }
+            });
+        }
+        
+        // 绑定事件监听
+        $(document).ready(function() {
+            const fetchHandler = _.debounce(fetchRank, 300);
+            // 监听三个要素的变化
+            $('#province, #score, #subject1').on('input change', function() {
+                if ($('#province').val() && $('#score').val() && $('#subject1').val()) {
+                    fetchHandler();
+                }
+            });
         });
     </script>
 
