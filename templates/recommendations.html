@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh">
+{% load custom_filters %}
 <head>
     <meta charset="UTF-8">
     <title>推荐高校</title>
@@ -48,17 +49,21 @@
                                         <td>
                                             {{ major.avg_score }}
                                             {% if major.score_diff > 0 %}
-                                                <span style="color:red;">+{{ major.score_diff }}</span>
+                                                <span style="color:red;">比您高 {{ major.score_diff }} 分</span>
                                             {% else %}
-                                                <span style="color:green;">{{ major.score_diff }}</span>
+                                                <span style="color:green;">比您低 {{ major.score_diff|abs }} 分</span>
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {{ major.avg_rank }}
-                                            {% if major.rank_diff > 0 %}
-                                                <span style="color:green;">+{{ major.rank_diff }}</span>
+                                            {% if major.avg_rank == 0 %}
+                                                <span>-</span>
                                             {% else %}
-                                                <span style="color:red;">{{ major.rank_diff }}</span>
+                                                {{ major.avg_rank }}
+                                                {% if major.rank_diff > 0 %}
+                                                    <span style="color:green;">比您低 {{ major.rank_diff }} 名</span>
+                                                {% else %}
+                                                    <span style="color:red;">比您高 {{ major.rank_diff|abs }} 名</span>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                         <td>{{ major.sub_req }}</td>

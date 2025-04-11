@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'loginRegister.apps.LoginregisterConfig',
     #'loginRegister',
-    #'GenerateStrategies',
+    'GenerateStrategies',
 ]
 
 MIDDLEWARE = [

@@ -53,31 +53,41 @@ def input_info(request):
         user_province = request.POST.get('province')
         user_subjects = [request.POST.get('subject1'), request.POST.get('subject2'), request.POST.get('subject3')]
 
+        # 验证省份有效性（示例省份列表，需根据实际数据补充）
+        valid_provinces = ['湖南', '湖北', '江苏']  # 添加所有支持的省份
+        if user_province not in valid_provinces:
+            return render(request, 'input_info.html', {'error': '暂不支持该省份查询'})
+
+        table_name = f"`2022-2024{user_province}招生情况`"
+
         # 连接数据库
         connection = pymysql.connect(**DB_CONFIG)
-        cursor = connection.cursor()
 
-        # SQL 查询：获取 2021-2023 年数据，并计算各专业的平均分
-        query = """
-            SELECT school_name, major, province, ROUND(AVG(min_score),2) AS avg_score, ROUND(AVG(lowest_rank),2) AS avg_rank, sub_req, is985, is211, isdoubleFC
-            FROM `2021-2023湖南省招生情况` NATURAL JOIN `所有院校信息`
-            WHERE year IN (2021, 2022, 2023)
-            GROUP BY school_name, major, province, sub_req
-            ORDER BY avg_score DESC;
-        """
-        cursor.execute(query)
-        data = cursor.fetchall()
+        try:
+            with connection.cursor() as cursor:
+                # SQL 查询：获取专业分数线数据，并计算各专业的平均分
+                query = f"""
+                    SELECT school_name, major, province, ROUND(AVG(min_score),2) AS avg_score, ROUND(AVG(lowest_rank),2) AS avg_rank, sub_req, is985, is211, isdoubleFC
+                    FROM {table_name} NATURAL JOIN `所有院校信息`
+                    GROUP BY school_name, major, sub_req
+                    ORDER BY avg_score DESC;
+                """
+                cursor.execute(query)
+                data = cursor.fetchall()
+        except pymysql.err.ProgrammingError as e:
+            print(f"数据库查询异常：{str(e)}")
+            return render(request, 'input_info.html', {'error': '该省份数据暂不可用'})
 
         # 转换为 Pandas DataFrame
         df = pd.DataFrame(data, columns=['school_name', 'major', 'province', 'avg_score', 'avg_rank', 'sub_req', 'is985', 'is211', 'isdoubleFC'])
 
         #添加分数和排名差距
-        df['score_diff'] = df['avg_score'] - user_score
-        df['rank_diff'] = df['avg_rank'] - user_rank
+        df['score_diff'] = (df['avg_score'] - user_score).round(2)
+        df['rank_diff'] = (df['avg_rank'] - user_rank).round(2)
 
         # 筛选满足分数要求的高校
         recommended_schools = df[
-            (df['avg_score'] >= (user_score - 60)) & (df['avg_score'] <= (user_score + 20))
+            (df['avg_score'] >= (user_score - 40)) & (df['avg_score'] <= (user_score + 20))
         ]
 
         # 筛选符合选科要求的专业
