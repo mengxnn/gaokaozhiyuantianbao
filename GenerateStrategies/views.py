@@ -3,6 +3,7 @@ import pymysql
 import pandas as pd
 from django.http import JsonResponse
 
+
 # 数据库连接信息
 DB_CONFIG = {
     'host': 'localhost',  # 数据库地址（本地/远程）
@@ -69,7 +70,7 @@ def input_info(request):
                 query = f"""
                     SELECT school_name, major, province, ROUND(AVG(min_score),2) AS avg_score, ROUND(AVG(lowest_rank),2) AS avg_rank, sub_req, is985, is211, isdoubleFC
                     FROM {table_name} NATURAL JOIN `所有院校信息`
-                    GROUP BY school_name, major, sub_req
+                    GROUP BY school_name, major, province, sub_req, is985, is211, isdoubleFC
                     ORDER BY avg_score DESC;
                 """
                 cursor.execute(query)
