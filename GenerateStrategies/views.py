@@ -68,14 +68,14 @@ def input_info(request):
         if user_province not in valid_provinces:
             return render(request, 'input_info.html', {'error': '暂不支持该省份查询'})
 
-        table_name = f"`2022-2024{user_province}招生情况`"
+        table_name = f"`{user_province}招生情况`"
 
         # 连接数据库
         connection = pymysql.connect(**DB_SCORE)
 
         try:
             with connection.cursor() as cursor:
-                # SQL 查询：获取专业分数线数据，并计算各专业的平均分
+                # SQL 查询：获取专业分数线数据
                 query = f"""
                     SELECT school_name, major, province, ROUND(AVG(min_score),2) AS avg_score, ROUND(AVG(lowest_rank),2) AS avg_rank, sub_req, is985, is211, isdoubleFC
                     FROM {table_name} NATURAL JOIN `所有院校信息`
