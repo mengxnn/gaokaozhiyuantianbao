@@ -5,11 +5,20 @@ from django.http import JsonResponse
 
 
 # 数据库连接信息
-DB_CONFIG = {
+DB_SCORE = {
     'host': 'localhost',  # 数据库地址（本地/远程）
     'user': 'root',  # 数据库用户名
     'password': '123456',  # 数据库密码
     'database': 'score',  # 数据库名
+    'charset': 'utf8mb4',  # 设定编码，防止中文乱码
+}
+
+# 注意要修改湖北省表的信息
+DB_YFYDB = {
+    'host': 'localhost',  # 数据库地址（本地/远程）
+    'user': 'root',  # 数据库用户名
+    'password': '123456',  # 数据库密码
+    'database': 'yfydb',  # 数据库名
     'charset': 'utf8mb4',  # 设定编码，防止中文乱码
 }
 
@@ -19,15 +28,15 @@ def get_rank(request):
         province = request.POST.get('province')
         score = int(request.POST.get('score'))
         subject1 = request.POST.get('subject1')  # 获取物理/历史
-        year = 2024  # 使用最新年份数据
+        year = 2024
 
-        connection = pymysql.connect(**DB_CONFIG)
+        connection = pymysql.connect(**DB_YFYDB)
         try:
             with connection.cursor() as cursor:
                 # 查询大于等于该分数的最小累计排名
-                query = """
+                query = f"""
                 SELECT tot_num 
-                FROM `一分一段表`
+                FROM `{province}{subject1}类一分一段表`
                 WHERE province = %s 
                     AND year = %s 
                     AND subject1 = %s
@@ -62,7 +71,7 @@ def input_info(request):
         table_name = f"`2022-2024{user_province}招生情况`"
 
         # 连接数据库
-        connection = pymysql.connect(**DB_CONFIG)
+        connection = pymysql.connect(**DB_SCORE)
 
         try:
             with connection.cursor() as cursor:
