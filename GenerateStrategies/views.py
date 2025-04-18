@@ -62,6 +62,7 @@ def input_info(request):
         user_rank = int(request.POST.get('rank'))
         user_province = request.POST.get('province')
         user_subjects = [request.POST.get('subject1'), request.POST.get('subject2'), request.POST.get('subject3')]
+        filter_double_first = request.POST.get('double_first_class') == '1'  #是否只去双一流
 
         # 验证省份有效性（示例省份列表，需根据实际数据补充）
         valid_provinces = ['湖南', '湖北', '江苏']  # 添加所有支持的省份
@@ -77,7 +78,10 @@ def input_info(request):
             with connection.cursor() as cursor:
                 # SQL 查询：获取专业分数线数据
                 query = f"""
-                    SELECT school_name, major, province, ROUND(AVG(min_score),2) AS avg_score, ROUND(AVG(lowest_rank),2) AS avg_rank, sub_req, is985, is211, isdoubleFC
+                    SELECT school_name, major, province,
+                    ROUND(AVG(min_score),2) AS avg_score,
+                    ROUND(AVG(lowest_rank),2) AS avg_rank,
+                    sub_req, is985, is211, isdoubleFC
                     FROM {table_name} NATURAL JOIN `所有院校信息`
                     GROUP BY school_name, major, province, sub_req, is985, is211, isdoubleFC
                     ORDER BY avg_score DESC;
@@ -99,6 +103,10 @@ def input_info(request):
         recommended_schools = df[
             (df['avg_score'] >= (user_score - 40)) & (df['avg_score'] <= (user_score + 20))
         ]
+
+        # 双一流筛选条件
+        if filter_double_first:
+            recommended_schools = recommended_schools[recommended_schools['isdoubleFC'] == '是']
 
         # 筛选符合选科要求的专业
         def filter_by_subject(row, selected_subjects):
