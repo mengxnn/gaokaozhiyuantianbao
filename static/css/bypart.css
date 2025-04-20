@@ -1,0 +1,72 @@
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.filters {
+    margin-bottom: 30px;
+    display: flex;
+    gap: 20px;
+}
+
+.select-box {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 200px;
+}
+
+#chart {
+    margin-bottom: 30px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+}
+
+#score-table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+#score-table th,
+#score-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+#score-table th {
+    background-color: #f8f9fa;
+}
+
+#score-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+body {
+    font-family: "Microsoft YaHei", Arial, sans-serif;
+}
+
+#chart {
+    font-family: "Microsoft YaHei", Arial, sans-serif !important;
+}
+
+/* 为容器添加顶部间距 */
+.container {
+    margin-top: 70px; /* 根据导航栏高度调整 */
+}
+
+/* 响应式调整（手机端适配） */
+@media (max-width: 768px) {
+    .container {
+        margin-top: 50px;
+    }
+}
+
+/* 修复导航栏定位问题 */
+.navbar-fixed-top {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1030;
+}

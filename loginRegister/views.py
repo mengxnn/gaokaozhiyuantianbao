@@ -1,6 +1,6 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
-from loginRegister.models import RegisterUser
+from loginRegister.models import RegisterUser,YFYDTable
 from django.shortcuts import redirect
 
 # Create your views here.
@@ -11,6 +11,15 @@ def index(request):
 
 def map(request):
     return render(request,'map.html')
+
+def bypart(request):
+    return render(request,'bypart.html')
+
+def get_scores(request):
+    data = list(YFYDTable.objects.all().values(
+        'year', 'province', 'subject1', 'score', 'num', 'tot_num'
+    ))
+    return JsonResponse(data, safe=False)
 
 def register(request):
     if request.method=="POST":
