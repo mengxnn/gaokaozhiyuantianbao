@@ -7,51 +7,114 @@
     <link rel="stylesheet" href="../static/css/bootstrap.css">
     <script src="../static/js/jquery-3.2.1.js"></script>
     <script src="../static/js/bootstrap.js"></script>
+    
+    <style>
+    /* 添加分类样式 */
+    .category-section {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        border: 1px solid #eee;
+        border-radius: 8px;
+    }
+    
+    .category-section h3 {
+        color: {% cycle '#e74c3c' '#2ecc71' '#3498db' %};
+        border-bottom: 2px solid {% cycle '#e74c3c' '#2ecc71' '#3498db' %};
+        padding-bottom: 0.5rem;
+    }
+    
+    .school-card {
+        background: #f9f9f9;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 6px;
+    }
+    
+    .major-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px dotted #ddd;
+    }
+    
+    .metrics span {
+        margin-left: 1rem;
+        font-size: 0.9em;
+        color: #666;
+    }
+    
+    .no-results {
+        color: #95a5a6;
+        font-style: italic;
+        padding: 1rem;
+    }
+    
+    .school-header {
+    cursor: pointer;
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    }
+    .majors-collapse {
+        margin-left: 20px;
+        border-left: 2px solid #007bff;
+        padding-left: 15px;
+    }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h2>推荐的高校</h2>
+<div class="container">
+    <h2>推荐的高校及专业</h2>
+    <!-- 显示分类推荐 -->
+    <div class="recommendation-categories">
+        {% for category in categories %}
+        <div class="category-section">
+            <h3>{{ category }}院校（{{ score_ranges|get_item:category|first }} - {{ score_ranges|get_item:category|last }}分）</h3>
+            {% if grouped_schools|get_item:category %}
+                <div class="school-list">
+                    {% for school in grouped_schools|get_item:category %}
+                    <div class="school-card">
+                        <!-- 学校名称和展开按钮 -->
+                        <div class="school-header" 
+                            onclick="toggleMajors('{{ category }}-{{ school.name|slugify }}-{{ forloop.counter0 }}')">
+                            <strong>{{ school.name }}</strong>
+                            <!-- 显示985、211、双一流信息 -->
+                            {% if school.majors.0.is985 == '是' %}
+                                <span class="badge badge-success">985</span>
+                            {% endif %}
+                            {% if school.majors.0.is211 == '是' %}
+                                <span class="badge badge-primary">211</span>
+                            {% endif %}
+                            {% if school.majors.0.isdoubleFC == '是' %}
+                                <span class="badge badge-info">双一流</span>
+                            {% endif %}
 
-        {% if grouped_schools %}
-            {% for group in grouped_schools %}
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <strong>{{ group.school_name }}</strong>
-                        <!-- 显示985、211、双一流信息 -->
-                        {% if group.0.0.is985 == '是' %}
-                            <span class="badge badge-success">985</span>
-                        {% endif %}
-                        {% if group.0.0.is211 == '是' %}
-                            <span class="badge badge-primary">211</span>
-                        {% endif %}
-                        {% if group.0.0.isdoubleFC == '是' %}
-                            <span class="badge badge-info">双一流</span>
-                        {% endif %}
-                        <button class="btn btn-info btn-xs pull-right" data-toggle="collapse" data-target="#collapse-{{ group.school_name }}">可填专业</button>
-                    </div>
-                    <div id="collapse-{{ group.school_name }}" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            <table class="table table-bordered">
+                            <button class="btn btn-link">▼ 查看可填专业（{{ school.majors|length }}个）</button>
+                        </div>
+                        <!-- 专业列表（默认隐藏） -->
+                        <!-- 专业列表ID添加索引 -->
+                        <div id="majors-{{ category }}-{{ school.name|slugify }}-{{ forloop.counter0 }}" 
+                             class="majors-collapse" 
+                             style="display:none;">
+                            <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>专业</th>
-                                        <th>省份</th>
+                                        <th>专业名称</th>
                                         <th>平均最低分</th>
                                         <th>平均最低位次</th>
-                                        <th>选科要求</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for major in group.0 %}
+                                    {% for major in school.majors %}
                                     <tr>
                                         <td>{{ major.major }}</td>
-                                        <td>{{ major.province }}</td>
                                         <td>
                                             {{ major.avg_score }}
-                                            {% if major.score_diff > 0 %}
-                                                <span style="color:red;">比您高 {{ major.score_diff }} 分</span>
+                                            {% if major.score_diff >= 0 %}
+                                                <span style="color:red;">比您高 {{ major.score_diff|floatformat:2 }}分</span>
                                             {% else %}
-                                                <span style="color:green;">比您低 {{ major.score_diff|abs }} 分</span>
+                                                <span style="color:green;">比您低 {{ major.score_diff|abs|floatformat:2 }}分</span>
                                             {% endif %}
                                         </td>
                                         <td>
@@ -59,25 +122,34 @@
                                                 <span>-</span>
                                             {% else %}
                                                 {{ major.avg_rank }}
-                                                {% if major.rank_diff > 0 %}
-                                                    <span style="color:green;">比您低 {{ major.rank_diff }} 名</span>
+                                                {% if major.rank_diff >= 0 %}
+                                                    <span style="color:green;">比您低 {{ major.rank_diff|floatformat:0 }}名</span>
                                                 {% else %}
-                                                    <span style="color:red;">比您高 {{ major.rank_diff|abs }} 名</span>
+                                                    <span style="color:red;">比您高 {{ major.rank_diff|abs|floatformat:0 }}名</span>
                                                 {% endif %}
                                             {% endif %}
                                         </td>
-                                        <td>{{ major.sub_req }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
-        {% else %}
-            <p>没有找到符合条件的高校。</p>
-        {% endif %}
+            {% else %}
+                <div class="no-results">暂无{{ category }}院校推荐</div>
+            {% endif %}
+        </div>
+        {% endfor %}
     </div>
+</div>
+<!-- 添加展开/折叠脚本 -->
+<script>
+function toggleMajors(schoolId) {
+    const element = document.getElementById(`majors-${schoolId}`);
+    element.style.display = element.style.display === 'none' ? 'block' : 'none';
+}
+</script>
 </body>
 </html>

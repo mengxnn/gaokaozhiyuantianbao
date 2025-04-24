@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+import numpy as np
 from django.shortcuts import render
 import pymysql
 import pandas as pd
@@ -92,21 +94,48 @@ def input_info(request):
             print(f"数据库查询异常：{str(e)}")
             return render(request, 'input_info.html', {'error': '该省份数据暂不可用'})
 
-        # 转换为 Pandas DataFrame
-        df = pd.DataFrame(data, columns=['school_name', 'major', 'province', 'avg_score', 'avg_rank', 'sub_req', 'is985', 'is211', 'isdoubleFC'])
+        # 关闭数据库连接
+        cursor.close()
+        connection.close()
 
-        #添加分数和排名差距
+        # 转换为 Pandas DataFrame
+        df = pd.DataFrame(data, columns=['school_name', 'major', 'province', 'avg_score',
+                                         'avg_rank', 'sub_req', 'is985', 'is211', 'isdoubleFC'])
+
+        # 添加分数和排名差距
         df['score_diff'] = (df['avg_score'] - user_score).round(2)
         df['rank_diff'] = (df['avg_rank'] - user_rank).round(2)
 
-        # 筛选满足分数要求的高校
+        # 定义分类边界
+        chong_range = (user_score + 1, user_score + 15)
+        wen_range = (user_score - 14, user_score)
+        bao_range = (user_score - 30, user_score - 15)
+
+        # 筛选满足分数要求的高校（保留原有分数范围）
         recommended_schools = df[
-            (df['avg_score'] >= (user_score - 40)) & (df['avg_score'] <= (user_score + 20))
-        ]
+            (df['avg_score'] >= bao_range[0]) &
+            (df['avg_score'] <= chong_range[1])
+            ]
+
+        # 新增分类逻辑
+        recommended_schools['category'] = pd.cut(
+            recommended_schools['avg_score'],
+            bins=[-np.inf, bao_range[1], wen_range[1], chong_range[1], np.inf],
+            labels=['保', '稳', '冲', '超出范围']
+        )
+
+        # 过滤掉超出范围的记录
+        recommended_schools = (
+            recommended_schools[
+            recommended_schools['category'] != '超出范围'
+            ]
+        )
 
         # 双一流筛选条件
         if filter_double_first:
-            recommended_schools = recommended_schools[recommended_schools['isdoubleFC'] == '是']
+            recommended_schools = recommended_schools[
+                recommended_schools['isdoubleFC'] == '是'
+            ]
 
         # 筛选符合选科要求的专业
         def filter_by_subject(row, selected_subjects):
@@ -133,20 +162,46 @@ def input_info(request):
             lambda row: filter_by_subject(row, user_subjects), axis=1
         )]
 
-        # 关闭数据库连接
-        cursor.close()
-        connection.close()
-
         # 按学校进行分组，确保每个学校显示多个专业
-        grouped_schools = recommended_schools.groupby('school_name').apply(
-            lambda x: x.to_dict(orient='records')).reset_index()
-        #print(grouped_schools)
-        # 转换为列表形式，方便模板使用
-        grouped_schools = grouped_schools[['school_name', 0]].to_dict(orient='records')
-        #print(grouped_schools)
-        # 返回推荐的高校
+        # 按分类和分数排序
+        recommended_schools = recommended_schools.sort_values(
+            by=['category', 'avg_score'],
+            ascending=[True, False]
+        )
+
+        # 分组处理
+        grouped_schools = {}
+        for category in ['冲', '稳', '保']:
+            category_data = []
+            # 按学校分组
+            for school_name, school_df in recommended_schools[recommended_schools['category'] == category].groupby(
+                    'school_name'):
+                school_info = {
+                    'name': school_name,
+                    'majors': school_df.to_dict(orient='records')  # 包含所有专业信息
+                }
+                category_data.append(school_info)
+            grouped_schools[category] = category_data  # 结构：{'冲': [学校1, 学校2...], ...}
+
+        print("分类数据预览：")
+        for category in ['冲', '稳', '保']:
+            print(f"{category}类院校数量：", len(grouped_schools.get(category, [])))
+
+        print("grouped_schools类型:", type(grouped_schools))  # 应为dict
+        print("grouped_schools键:", grouped_schools.keys())  # 应包含'冲','稳','保'
+
+        print("冲类院校示例:", grouped_schools['冲'][0]['name'])  # 应输出学校名称
+        print("首个学校专业数:", len(grouped_schools['冲'][0]['majors']))  # 应>0
+
         return render(request, 'recommendations.html', {
-            'grouped_schools': grouped_schools
+            'grouped_schools': grouped_schools,
+            'user_score': user_score,
+            'score_ranges': {
+                '冲': chong_range,
+                '稳': wen_range,
+                '保': bao_range
+            },
+            'categories': ['冲', '稳', '保']  # 新增分类列表
         })
 
     return render(request, 'input_info.html')
