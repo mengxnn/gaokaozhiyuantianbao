@@ -121,7 +121,7 @@ def input_info(request):
         recommended_schools['category'] = pd.cut(
             recommended_schools['avg_score'],
             bins=[-np.inf, bao_range[1], wen_range[1], chong_range[1], np.inf],
-            labels=['保', '稳', '冲', '超出范围']
+            labels=['可保底', '较稳妥', '可冲击', '超出范围']
         )
 
         # 过滤掉超出范围的记录
@@ -171,7 +171,7 @@ def input_info(request):
 
         # 分组处理
         grouped_schools = {}
-        for category in ['冲', '稳', '保']:
+        for category in ['可冲击', '较稳妥', '可保底']:
             category_data = []
             # 按学校分组
             for school_name, school_df in recommended_schools[recommended_schools['category'] == category].groupby(
@@ -184,24 +184,24 @@ def input_info(request):
             grouped_schools[category] = category_data  # 结构：{'冲': [学校1, 学校2...], ...}
 
         print("分类数据预览：")
-        for category in ['冲', '稳', '保']:
+        for category in ['可冲击', '较稳妥', '可保底']:
             print(f"{category}类院校数量：", len(grouped_schools.get(category, [])))
 
         print("grouped_schools类型:", type(grouped_schools))  # 应为dict
         print("grouped_schools键:", grouped_schools.keys())  # 应包含'冲','稳','保'
 
-        print("冲类院校示例:", grouped_schools['冲'][0]['name'])  # 应输出学校名称
-        print("首个学校专业数:", len(grouped_schools['冲'][0]['majors']))  # 应>0
+        print("冲类院校示例:", grouped_schools['可冲击'][0]['name'])  # 应输出学校名称
+        print("首个学校专业数:", len(grouped_schools['可冲击'][0]['majors']))  # 应>0
 
         return render(request, 'recommendations.html', {
             'grouped_schools': grouped_schools,
             'user_score': user_score,
             'score_ranges': {
-                '冲': chong_range,
-                '稳': wen_range,
-                '保': bao_range
+                '可冲击': chong_range,
+                '较稳妥': wen_range,
+                '可保底': bao_range
             },
-            'categories': ['冲', '稳', '保']  # 新增分类列表
+            'categories': ['可冲击', '较稳妥', '可保底']  # 新增分类列表
         })
 
     return render(request, 'input_info.html')
