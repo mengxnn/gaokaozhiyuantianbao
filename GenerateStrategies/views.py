@@ -24,6 +24,7 @@ DB_YFYDB = {
     'charset': 'utf8mb4',  # 设定编码，防止中文乱码
 }
 
+valid_provinces = ['湖南', '湖北', '江苏']  # 所有支持的省份
 
 def get_rank(request):
     if request.method == 'POST':
@@ -31,6 +32,9 @@ def get_rank(request):
         score = int(request.POST.get('score'))
         subject1 = request.POST.get('subject1')  # 获取物理/历史
         year = 2024
+
+        if province not in valid_provinces:
+            return JsonResponse({'error': '暂不支持该省份查询'}, status=400)
 
         connection = pymysql.connect(**DB_YFYDB)
         try:
@@ -66,9 +70,9 @@ def input_info(request):
         user_subjects = [request.POST.get('subject1'), request.POST.get('subject2'), request.POST.get('subject3')]
         filter_double_first = request.POST.get('double_first_class') == '1'  #是否只去双一流
 
-        # 验证省份有效性（示例省份列表，需根据实际数据补充）
-        valid_provinces = ['湖南', '湖北', '江苏']  # 添加所有支持的省份
+        # 验证省份有效性
         if user_province not in valid_provinces:
+            print("省份无效，触发错误提示")  # 检查控制台输出
             return render(request, 'input_info.html', {'error': '暂不支持该省份查询'})
 
         table_name = f"`{user_province}招生情况`"

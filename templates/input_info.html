@@ -174,8 +174,21 @@
                     }
                 },
                 error: function(xhr) {
-                    let msg = xhr.status === 400 ? '参数错误' : '服务不可用';
-                    alert(`获取排名失败（${msg}），请手动输入`);
+                    try {
+                        // 尝试解析响应JSON
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.error) {
+                            // 显示服务器返回的具体错误
+                            alert(response.error);
+                        } else {
+                            let msg = xhr.status === 400 ? '参数错误' : '服务不可用';
+                            alert(`获取排名失败（${msg}），请手动输入`);
+                        }
+                    } catch (e) {
+                        // 如果无法解析JSON，显示通用错误
+                        let msg = xhr.status === 400 ? '参数错误' : '服务不可用';
+                        alert(`获取排名失败（${msg}），请手动输入`);
+                    }
                 },
                 beforeSend: function() {
                     $('#rank').css('background', '#fff8e1');
