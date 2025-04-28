@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'loginRegister.apps.LoginregisterConfig',
-    #'loginRegister',
+    # 'loginRegister.apps.LoginregisterConfig',
+    'loginRegister',
     'GenerateStrategies',
 ]
 

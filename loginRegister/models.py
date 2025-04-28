@@ -5,7 +5,13 @@ from django.db import models
 class RegisterUser(models.Model):
     email=models.EmailField(max_length=100,unique=True,blank=False)
     password=models.CharField(max_length=32,blank=False)
-    username=models.CharField(max_length=100,unique=True,blank=False)
+    username=models.CharField(max_length=50,unique=True,blank=False)
+    isvip=models.BooleanField(default=False)
+    phone=models.CharField(max_length=20, null=True, default='')
+    score=models.IntegerField(default=0)
+    subject1=models.CharField(max_length=10, null=True, default='')
+    subject2 = models.CharField(max_length=10, null=True, default='')
+    subject3 = models.CharField(max_length=10, null=True, default='')
 
     def __str__(self):
         return self.username

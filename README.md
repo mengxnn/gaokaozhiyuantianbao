@@ -17,6 +17,15 @@
     python manage.py makemigrations
     python manage.py migrate
 
+    若之前已进行迁移，需要手动修改表的格式：
+    ALTER TABLE loginRegister_registeruser
+    ADD isvip BOOLEAN DEFAULT FALSE,
+    ADD phone VARCHAR(20),
+    ADD score INTEGER DEFAULT 0,
+    ADD subject1 VARCHAR(10),
+    ADD subject2 VARCHAR(10),
+    ADD subject3 VARCHAR(10);
+
     register_info中的表loginregister_yfydtable需要导入一分一段总表，即各省份一起导入
 
 ### 其他注意事项
