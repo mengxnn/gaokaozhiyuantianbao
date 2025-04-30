@@ -6,8 +6,15 @@ from django.shortcuts import redirect
 # Create your views here.
 
 def index(request):
-    login_msg="恭喜！登录成功"
-    return render(request,'index.html',{'login_msg':login_msg})
+    user = None
+    if request.session.get('is_authenticated'):
+        try:
+            user_id = request.session.get('user_id')
+            user = RegisterUser.objects.get(id=user_id)
+        except RegisterUser.DoesNotExist:
+            # 如果用户不存在，清除会话
+            request.session.flush()
+    return render(request, 'index.html', {'user': user})
 
 def map(request):
     return render(request,'map.html')
@@ -65,12 +72,14 @@ def register(request):
 def login(request):
     if request.method=="POST":
         userName=request.POST.get("userName")
-        # userEmail=request.POST.get('userName')
         userPassword=request.POST.get('userPassword')
         try:  #检查数据库中是否存在该用户
-            # Email=RegisterUser.objects.get(email=userEmail)
             user=RegisterUser.objects.get(username=userName)  #使用用户名和密码验证登录
             if userPassword==user.password:  #密码正确，登录成功
+                # 登录成功，保存用户信息到会话
+                request.session['user_id'] = user.id
+                request.session['username'] = user.username
+                request.session['is_authenticated'] = True
                 return redirect('/index/')
             else:
                 error_msg="密码错误"
@@ -81,4 +90,7 @@ def login(request):
     else:
         return render(request, 'login.html')
 
-
+def logout(request):
+    # 清除会话
+    request.session.flush()
+    return redirect('/index/')

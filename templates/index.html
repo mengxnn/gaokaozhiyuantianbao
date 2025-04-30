@@ -62,6 +62,14 @@
                     <li><a href="/map"><i class="fas fa-map-marked-alt"></i> 双一流高校地图</a></li>
                     <li><a href="#"><i class="fas fa-book-open"></i> 专业百科</a></li>
                 </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if user %}
+                        <li><a href="#">欢迎您，{{ user.username }}</a></li>
+                        <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> 退出登录</a></li>
+                    {% else %}
+                        <li><a href="/login"><i class="fas fa-sign-in-alt"></i> 登录/注册</a></li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </nav>
@@ -72,7 +80,7 @@
             <h1>高考志愿智能填报系统</h1>
             <p class="lead">基于百万级数据，为您提供精准志愿推荐服务</p>
             <div class="btn-group">
-                <a href="{% url 'input_info' %}" class="btn btn-success btn-lg start-btn">
+                <a href="{% url 'input_info' %}" class="btn btn-success btn-lg start-btn" {% if not user %}onclick="alert('请先进行登录！'); return false;"{% endif %}>
                     <i class="fas fa-play-circle"></i> 立即开始
                 </a>
             </div>
