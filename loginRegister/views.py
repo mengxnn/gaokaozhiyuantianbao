@@ -2,6 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from loginRegister.models import RegisterUser,YFYDTable
 from django.shortcuts import redirect
+from django.contrib import messages
 
 # Create your views here.
 
@@ -15,6 +16,50 @@ def index(request):
             # 如果用户不存在，清除会话
             request.session.flush()
     return render(request, 'index.html', {'user': user})
+
+def profile(request):
+    if not request.session.get('is_authenticated'):
+        return redirect('login')
+    user_id = request.session.get('user_id')
+    try:
+        user = RegisterUser.objects.get(id=user_id)
+    except RegisterUser.DoesNotExist:
+        request.session.flush()
+        return redirect('login')
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        subject1 = request.POST.get('subject1')
+        subject2 = request.POST.get('subject2')
+        subject3 = request.POST.get('subject3')
+        score=request.POST.get('score')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        if not username or not email:
+            return render(request, 'profile.html', {'user': user, 'error': '用户名和邮箱不能为空'})
+        if RegisterUser.objects.filter(username=username).exclude(id=user.id).exists():
+            return render(request, 'profile.html', {'user': user, 'error': '用户名已存在'})
+        if RegisterUser.objects.filter(email=email).exclude(id=user.id).exists():
+            return render(request, 'profile.html', {'user': user, 'error': '邮箱已存在'})
+        if new_password and confirm_password:
+            if new_password != confirm_password:
+                return render(request, 'profile.html', {'user': user, 'error': '新密码不匹配'})
+            else:
+                user.password = new_password
+        user.username = username
+        user.email = email
+        user.phone = phone
+        user.subject1 = subject1
+        user.subject2 = subject2
+        user.subject3 = subject3
+        user.score = score
+        user.save()
+        request.session['username'] = username  # 更新会话中的用户名
+        messages.success(request, '修改信息成功')
+        return redirect('/profile')
+    else:
+        return render(request, 'profile.html', {'user': user})
 
 def map(request):
     return render(request,'map.html')

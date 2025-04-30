@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>个人中心 - 高考志愿通</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <style>
+        body {
+            padding-top: 70px;
+            background-image: url("../static/img/孔明灯.png");
+            background-size: cover;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(249, 249, 249, 0.75); /* 半透明背景 */
+            border-radius: 8px;
+        }
+        .form-group { margin-bottom: 15px; }
+        .error { color: red; margin-bottom: 15px; }
+        .info { margin-top: 20px; }
+    </style>
+</head>
+{% load static %}
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/index">高考志愿通</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="/index"><i class="fas fa-home"></i> 首页</a></li>
+                    <li><a href="#"><i class="fas fa-table"></i> 各省分数线</a></li>
+                    <li><a href="/bypart"><i class="fas fa-chart-line"></i> 一分一段表</a></li>
+                    <li><a href="/map"><i class="fas fa-map-marked-alt"></i> 双一流高校地图</a></li>
+                    <li><a href="#"><i class="fas fa-book-open"></i> 专业百科</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if user %}
+                        <li><a href="#">欢迎您，{{ user.username }}</a></li>
+                        <li><a href="/profile">个人中心</a></li>
+                        <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> 退出登录</a></li>
+                    {% else %}
+                        <li><a href="/login"><i class="fas fa-sign-in-alt"></i> 登录/注册</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <h2>个人中心</h2>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+            <form method="post" class="form-horizontal">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">用户名:</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="username" value="{{ user.username }}" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">邮箱:</label>
+                    <div class="col-sm-9">
+                        <input type="email" name="email" value="{{ user.email }}" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">手机号:</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="phone" value="{{ user.phone }}" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">科目1:</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="subject1" value="{{ user.subject1 }}" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">科目2:</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="subject2" value="{{ user.subject2 }}" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">科目3:</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="subject3" value="{{ user.subject3 }}" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">分数:</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="score" value="{{ user.score }}" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">新密码:</label>
+                    <div class="col-sm-9">
+                        <input type="password" name="new_password" class="form-control" placeholder="留空则不修改">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">确认新密码:</label>
+                    <div class="col-sm-9">
+                        <input type="password" name="confirm_password" class="form-control" placeholder="留空则不修改">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </div>
+            </form>
+            <div class="info">
+                <p><strong>是否VIP:</strong> {{ user.isvip|yesno:"是,否" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../static/js/jquery-3.2.1.js"></script>
+    <script src="../static/js/bootstrap.js"></script>
+</body>
+</html>

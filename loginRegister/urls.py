@@ -8,4 +8,9 @@ urlpatterns = [
     path('map/', views.map, name='map'),
     path('bypart/', views.bypart, name='bypart'),
     path('api/scores/', views.get_scores, name='get_scores'),
+    path('login/', views.login),
+    path('logout/', views.logout, name='logout'),
+    path('index/', views.index),
+    path('register/', views.register),
+    path('profile/', views.profile, name='profile'),
 ]
