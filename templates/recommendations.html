@@ -90,10 +90,12 @@
                                 <span class="badge badge-info">双一流</span>
                             {% endif %}
 
-                            <button class="btn btn-link">▼ 查看可填专业（{{ school.majors|length }}个）</button>
+                            <button class="btn btn-link" id="toggle-btn-{{ category }}-{{ school.name|slugify }}-{{ forloop.counter0 }}">
+                                ▼ 查看可填专业（{{ school.majors|length }}个）
+                            </button>
                         </div>
                         <!-- 专业列表（默认隐藏） -->
-                        <!-- 专业列表ID添加索引 -->
+
                         <div id="majors-{{ category }}-{{ school.name|slugify }}-{{ forloop.counter0 }}" 
                              class="majors-collapse" 
                              style="display:none;">
@@ -149,6 +151,19 @@
 function toggleMajors(schoolId) {
     const element = document.getElementById(`majors-${schoolId}`);
     element.style.display = element.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+<!-- 下拉动画 -->
+<script>
+function toggleMajors(schoolId) {
+    const $element = $(`#majors-${schoolId}`);
+    const $button = $(`#majors-${schoolId}`).prev('.school-header').find('.btn-link');
+    const isVisible = $element.is(':visible');
+    
+    $element.slideToggle(300, function() {
+        // 动画完成后更新按钮文本
+        $button.text(isVisible ? `▼ 查看可填专业（${$element.find('tr').length}个）` : `▲ 收起可填专业`);
+    });
 }
 </script>
 </body>
