@@ -9,7 +9,7 @@ class RegisterUser(models.Model):
     isvip=models.BooleanField(default=False)
     phone=models.CharField(max_length=20, null=True, default='')
     province=models.CharField(max_length=20, null=True, default='')
-    score=models.IntegerField(default=0)
+    score=models.IntegerField(null=True, default=0)
     subject1=models.CharField(max_length=10, null=True, default='')
     subject2 = models.CharField(max_length=10, null=True, default='')
     subject3 = models.CharField(max_length=10, null=True, default='')

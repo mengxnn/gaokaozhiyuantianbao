@@ -4,6 +4,8 @@ from django.shortcuts import render
 import pymysql
 import pandas as pd
 from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from loginRegister.models import RegisterUser
 
 
 # 数据库连接信息
@@ -62,6 +64,25 @@ def get_rank(request):
                 connection.close()
 
 def input_info(request):
+    if not request.session.get('is_authenticated'):
+        return redirect('/login')
+    user_id = request.session.get('user_id')
+    user_data = {}
+    try:
+        user = RegisterUser.objects.get(id=user_id)
+        user_data = {
+            'province': user.province if hasattr(user, 'province') else '',
+            'subject1': user.subject1 or '',
+            'subject2': user.subject2 or '',
+            'subject3': user.subject3 or '',
+            'score': user.score if user.score else ''
+        }
+    except RegisterUser.DoesNotExist:
+        request.session.flush()
+        return redirect('/login')
+
+
+
     if request.method == 'POST':
         # 获取用户的输入数据
         user_score = int(request.POST.get('score'))  # 确保用户分数是整数
@@ -73,7 +94,7 @@ def input_info(request):
         # 验证省份有效性
         if user_province not in valid_provinces:
             print("省份无效，触发错误提示")  # 检查控制台输出
-            return render(request, 'input_info.html', {'error': '暂不支持该省份查询'})
+            return render(request, 'input_info.html', {'error': '暂不支持该省份查询', 'user_data': user_data})
 
         table_name = f"`{user_province}招生情况`"
 
@@ -96,7 +117,7 @@ def input_info(request):
                 data = cursor.fetchall()
         except pymysql.err.ProgrammingError as e:
             print(f"数据库查询异常：{str(e)}")
-            return render(request, 'input_info.html', {'error': '该省份数据暂不可用'})
+            return render(request, 'input_info.html', {'error': '该省份数据暂不可用', 'user_data': user_data})
 
         # 关闭数据库连接
         cursor.close()
@@ -144,7 +165,6 @@ def input_info(request):
         # 筛选符合选科要求的专业
         def filter_by_subject(row, selected_subjects):
             sub_req = row['sub_req']
-            #print(sub_req)
             # 提取首选科目（如 "首选物理"）
             if "首选" in sub_req:
                 first_subject = sub_req.split("，")[0].replace("首选", "").strip()  #按“，”分开；将“首选”替换成空串
@@ -186,7 +206,7 @@ def input_info(request):
                 }
                 category_data.append(school_info)
             grouped_schools[category] = category_data  # 结构：{'冲': [学校1, 学校2...], ...}
-
+        '''
         print("分类数据预览：")
         for category in ['可冲击', '较稳妥', '可保底']:
             print(f"{category}类院校数量：", len(grouped_schools.get(category, [])))
@@ -196,7 +216,7 @@ def input_info(request):
 
         print("冲类院校示例:", grouped_schools['可冲击'][0]['name'])  # 应输出学校名称
         print("首个学校专业数:", len(grouped_schools['可冲击'][0]['majors']))  # 应>0
-
+        '''
         return render(request, 'recommendations.html', {
             'grouped_schools': grouped_schools,
             'user_score': user_score,
@@ -208,8 +228,7 @@ def input_info(request):
             'categories': ['可冲击', '较稳妥', '可保底']  # 新增分类列表
         })
 
-    return render(request, 'input_info.html')
-
+    return render(request, 'input_info.html', {'user_data': user_data})
 
 def recommendations(request):
     recommend_msg = "推荐信息"

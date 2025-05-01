@@ -11,11 +11,14 @@
 <body>
     <div class="container">
         <h2>填写信息</h2>
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
         <form method="POST">
             {% csrf_token %}
             <div class="form-group">
                 <label for="province">省份:</label>
-                <input type="text" class="form-control" id="province" name="province" required>
+                <input type="text" class="form-control" id="province" name="province" value="{{ user_data.province }}" required>
             </div>
             
             <!-- 选科部分 -->
@@ -23,7 +26,12 @@
                 <label>选科:</label>
                 <div class="btn-group">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="subject1-btn">
-                        请选择科目1 <span class="caret"></span>
+                        {% if user_data.subject1 %}
+                            {{ user_data.subject1 }}
+                        {% else %}
+                            请选择科目1
+                        {% endif %} 
+                        <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" id="subject1-menu">
                         <li><a href="#">物理</a></li>
@@ -33,7 +41,12 @@
 
                 <div class="btn-group">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="subject2-btn">
-                        请选择科目2 <span class="caret"></span>
+                        {% if user_data.subject2 %}
+                            {{ user_data.subject2 }}
+                        {% else %}
+                            请选择科目2
+                        {% endif %}
+                        <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" id="subject2-menu">
                         <li><a href="#">化学</a></li>
@@ -45,7 +58,12 @@
 
                 <div class="btn-group">
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="subject3-btn">
-                        请选择科目3 <span class="caret"></span>
+                        {% if user_data.subject3 %}
+                            {{ user_data.subject3 }}
+                        {% else %}
+                            请选择科目3
+                        {% endif %}
+                        <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" id="subject3-menu">
                         <li><a href="#">化学</a></li>
@@ -56,14 +74,14 @@
                 </div>
                 
                 <!-- 隐藏的 input 存储用户选择的选科 -->
-                <input type="hidden" id="subject1" name="subject1">
-                <input type="hidden" id="subject2" name="subject2">
-                <input type="hidden" id="subject3" name="subject3">
+                <input type="hidden" id="subject1" name="subject1" value="{{ user_data.subject1 }}">
+                <input type="hidden" id="subject2" name="subject2" value="{{ user_data.subject2 }}">
+                <input type="hidden" id="subject3" name="subject3" value="{{ user_data.subject3 }}">
             </div>
             
             <div class="form-group">
                 <label for="score">分数:</label>
-                <input type="number" class="form-control" id="score" name="score" required>
+                <input type="number" class="form-control" id="score" name="score" value="{{ user_data.score }}" required>
             </div>
             <div class="form-group">
                 <label for="rank">排名:</label>
@@ -209,6 +227,10 @@
                     fetchHandler();
                 }
             });
+            // 触发初始排名计算
+            if ($('#province').val() && $('#score').val() && $('#subject1').val()) {
+                fetchHandler();
+            }
         });
     </script>
 
