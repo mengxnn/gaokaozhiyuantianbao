@@ -8,6 +8,7 @@ class RegisterUser(models.Model):
     username=models.CharField(max_length=50,unique=True,blank=False)
     isvip=models.BooleanField(default=False)
     phone=models.CharField(max_length=20, null=True, default='')
+    province=models.CharField(max_length=20, null=True, default='')
     score=models.IntegerField(default=0)
     subject1=models.CharField(max_length=10, null=True, default='')
     subject2 = models.CharField(max_length=10, null=True, default='')

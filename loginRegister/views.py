@@ -30,6 +30,7 @@ def profile(request):
         username = request.POST.get('username')
         email = request.POST.get('email')
         phone = request.POST.get('phone')
+        province=request.POST.get('province')
         subject1 = request.POST.get('subject1')
         subject2 = request.POST.get('subject2')
         subject3 = request.POST.get('subject3')
@@ -50,6 +51,7 @@ def profile(request):
         user.username = username
         user.email = email
         user.phone = phone
+        user.province = province
         user.subject1 = subject1
         user.subject2 = subject2
         user.subject3 = subject3
