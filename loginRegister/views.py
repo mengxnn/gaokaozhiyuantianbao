@@ -3,8 +3,17 @@ from django.shortcuts import render
 from loginRegister.models import RegisterUser,YFYDTable
 from django.shortcuts import redirect
 from django.contrib import messages
+import mysql.connector
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-# Create your views here.
+# 数据库连接信息
+DB_SCORE = {
+    'host': 'localhost',  # 数据库地址（本地/远程）
+    'user': 'root',  # 数据库用户名
+    'password': '123456',  # 数据库密码
+    'database': 'score',  # 数据库名
+    'charset': 'utf8mb4',  # 设定编码，防止中文乱码
+}
 
 def index(request):
     user = None
@@ -67,7 +76,15 @@ def map(request):
     return render(request,'map.html')
 
 def bypart(request):
-    return render(request,'bypart.html')
+    user = None
+    if request.session.get('is_authenticated'):
+        try:
+            user_id = request.session.get('user_id')
+            user = RegisterUser.objects.get(id=user_id)
+        except RegisterUser.DoesNotExist:
+            # 如果用户不存在，清除会话
+            request.session.flush()
+    return render(request,'bypart.html', {'user': user})
 
 def get_scores(request):
     data = list(YFYDTable.objects.all().values(
@@ -141,3 +158,109 @@ def logout(request):
     # 清除会话
     request.session.flush()
     return redirect('/index/')
+
+
+# 添加新的高校查询视图
+def search_universities(request):
+    user = None
+    if request.session.get('is_authenticated'):
+        try:
+            user_id = request.session.get('user_id')
+            user = RegisterUser.objects.get(id=user_id)
+        except RegisterUser.DoesNotExist:
+            # 如果用户不存在，清除会话
+            request.session.flush()
+
+    try:
+        # 连接数据库
+        db_conn = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='123456',
+            database='score',
+            charset='utf8mb4'
+        )
+        cursor = db_conn.cursor(dictionary=True)
+
+        # 获取过滤参数
+        search_query = request.GET.get('search', '')
+        province = request.GET.get('province', '')
+        school_type = request.GET.get('school_type', '')
+        department = request.GET.get('department', '')
+
+        # 基础SQL查询
+        sql = "SELECT * FROM 所有院校信息 WHERE 1=1"
+        params = []
+
+        # 添加过滤条件
+        if search_query:
+            sql += " AND school_name LIKE %s"
+            params.append(f'%{search_query}%')
+
+        if province:
+            sql += " AND province = %s"
+            params.append(province)
+
+        if school_type:
+            sql += " AND type = %s"
+            params.append(school_type)
+
+        if department:
+            sql += " AND nature = %s"
+            params.append(department)
+
+        # 排序
+        sql += " ORDER BY school_name"
+
+        # 执行查询
+        cursor.execute(sql, params)
+        universities = cursor.fetchall()
+
+        # 获取下拉筛选器的唯一值
+        cursor.execute("SELECT DISTINCT province FROM 所有院校信息 ORDER BY province")
+        provinces = [row['province'] for row in cursor.fetchall()]
+
+        cursor.execute("SELECT DISTINCT type FROM 所有院校信息 ORDER BY type")
+        school_types = [row['type'] for row in cursor.fetchall()]
+
+        cursor.execute("SELECT DISTINCT nature FROM 所有院校信息 ORDER BY nature")
+        departments = [row['nature'] for row in cursor.fetchall()]
+
+        # 分页处理
+        page = request.GET.get('page', 1)
+        paginator = Paginator(universities, 20)  # 每页显示20所高校
+
+        try:
+            universities_page = paginator.page(page)
+        except PageNotAnInteger:
+            universities_page = paginator.page(1)
+        except EmptyPage:
+            universities_page = paginator.page(paginator.num_pages)
+
+        context = {
+            'universities': universities_page,
+            'provinces': provinces,
+            'school_types': school_types,
+            'departments': departments,
+            'search_query': search_query,
+            'selected_province': province,
+            'selected_school_type': school_type,
+            'selected_department': department,
+            'user': user,
+        }
+
+    except mysql.connector.Error as err:
+        context = {
+            'error': f"数据库错误: {err}",
+            'user': request.user,
+        }
+    finally:
+        # 关闭数据库连接
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'db_conn' in locals() and db_conn:
+            db_conn.close()
+
+
+
+    return render(request, 'search_universities.html', context)
