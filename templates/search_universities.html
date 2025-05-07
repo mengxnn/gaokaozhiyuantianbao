@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>高校查询 - 高考志愿智能填报系统</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/mycss.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .table-responsive {
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .badge-985 {
+            background-color: #d9534f;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            margin-right: 5px;
+        }
+        .badge-211 {
+            background-color: #5bc0de;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            margin-right: 5px;
+        }
+        .badge-doubleclass {
+            background-color: #5cb85c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+        }
+        .filter-tag {
+            margin-right: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        .university-count {
+            margin-bottom: 15px;
+            font-size: 16px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+        .page-header {
+            margin-top: 80px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+{% load static %}
+<body>
+    
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="sr-only">导航</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-graduation-cap"></i> 高考志愿通
+                </a>
+            </div>
+            
+            <div class="collapse navbar-collapse" id="navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="/index"><i class="fas fa-home"></i> 首页</a></li>
+                    <li><a href="#"><i class="fas fa-table"></i> 各省分数线</a></li>
+                    <li><a href="/bypart"><i class="fas fa-chart-line"></i> 一分一段表</a></li>
+                    <li><a href="/map"><i class="fas fa-map-marked-alt"></i> 双一流高校地图</a></li>
+                    <li class="active"><a href="/search_universities/"><i class="fas fa-university"></i> 高校查询</a></li>
+                    <li><a href="#"><i class="fas fa-book-open"></i> 专业百科</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    {% if user %}
+                        <li><a href="#">欢迎您，{{ user.username }}</a></li>
+                        <li><a href="/profile">个人中心</a></li>
+                        <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> 退出登录</a></li>
+                    {% else %}
+                        <li><a href="/login"><i class="fas fa-sign-in-alt"></i> 登录/注册</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-university"></i> 高校查询</h1>
+        </div>
+        
+        {% if error %}
+            <div class="alert alert-danger">
+                <strong>错误：</strong> {{ error }}
+            </div>
+        {% else %}
+            <!-- 搜索框 -->
+            <div class="search-box">
+                <form method="GET" action="/search_universities/">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="请输入高校名称..." name="search" value="{{ search_query }}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i> 搜索</button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- 筛选部分 -->
+            <div class="filter-section">
+                <h4><i class="fas fa-filter"></i> 筛选条件</h4>
+                <form method="GET" action="/search_universities/" id="filter-form">
+                    <!-- 保留搜索词 -->
+                    {% if search_query %}
+                        <input type="hidden" name="search" value="{{ search_query }}">
+                    {% endif %}
+                    
+                    <!-- 省份筛选 -->
+                    <div class="form-group">
+                        <label><strong>省份：</strong></label>
+                        <div>
+                            <a href="#" class="filter-tag btn btn-sm {% if not selected_province %}btn-primary{% else %}btn-default{% endif %}" 
+                               onclick="setFilter('province', ''); return false;">全部</a>
+                            
+                            {% for province in provinces %}
+                                <a href="#" class="filter-tag btn btn-sm {% if selected_province == province %}btn-primary{% else %}btn-default{% endif %}" 
+                                   onclick="setFilter('province', '{{ province }}'); return false;">{{ province }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- 办学类型筛选 -->
+                    <div class="form-group">
+                        <label><strong>办学类型：</strong></label>
+                        <div>
+                            <a href="#" class="filter-tag btn btn-sm {% if not selected_school_type %}btn-primary{% else %}btn-default{% endif %}" 
+                               onclick="setFilter('school_type', ''); return false;">全部</a>
+                            
+                            {% for type in school_types %}
+                                <a href="#" class="filter-tag btn btn-sm {% if selected_school_type == type %}btn-primary{% else %}btn-default{% endif %}" 
+                                   onclick="setFilter('school_type', '{{ type }}'); return false;">{{ type }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- 主管部门筛选 -->
+                    <div class="form-group">
+                        <label><strong>主管部门：</strong></label>
+                        <div>
+                            <a href="#" class="filter-tag btn btn-sm {% if not selected_department %}btn-primary{% else %}btn-default{% endif %}" 
+                               onclick="setFilter('department', ''); return false;">全部</a>
+                            
+                            {% for dept in departments %}
+                                <a href="#" class="filter-tag btn btn-sm {% if selected_department == dept %}btn-primary{% else %}btn-default{% endif %}" 
+                                   onclick="setFilter('department', '{{ dept }}'); return false;">{{ dept }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- 隐藏字段保存当前选中的筛选值 -->
+                    <input type="hidden" name="province" id="province-filter" value="{{ selected_province }}">
+                    <input type="hidden" name="school_type" id="school_type-filter" value="{{ selected_school_type }}">
+                    <input type="hidden" name="department" id="department-filter" value="{{ selected_department }}">
+                </form>
+            </div>
+            
+            <!-- 当前筛选结果数量 -->
+            <div class="university-count">
+                <strong>共找到 {{ universities.paginator.count }} 所高校</strong>
+                {% if search_query or selected_province or selected_school_type or selected_department %}
+                    <a href="/search_universities/" class="btn btn-sm btn-warning pull-right"><i class="fas fa-times"></i> 清除所有筛选</a>
+                {% endif %}
+            </div>
+            
+            <!-- 高校列表 -->
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>院校名称</th>
+                            <th>院校所在地</th>
+                            <th>教育行政主管部门</th>
+                            <th>学历层次</th>
+                            <th>院校类型</th>
+                            <th>办学类型</th>
+                            <th>标签</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for university in universities %}
+                            <tr>
+                                <td><strong>{{ university.school_name }}</strong></td>
+                                <td>{{ university.province }}</td>
+                                <td>{{ university.belong }}</td>
+                                <td>{{ university.level }}</td>
+                                <td>{{ university.type }}</td>
+                                <td>{{ university.nature }}</td>
+                                <td>
+                                    {% if university.is985 == '是' %}
+                                        <span class="badge badge-985">985</span>
+                                    {% endif %}
+                                    {% if university.is211 == '是' %}
+                                        <span class="badge badge-211">211</span>
+                                    {% endif %}
+                                    {% if university.isdoubleFC == '是' %}
+                                        <span class="badge badge-doubleclass">双一流</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">没有找到符合条件的高校</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 分页 -->
+            <div class="text-center">
+                <ul class="pagination">
+                    {% if universities.has_previous %}
+                        <li><a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_province %}province={{ selected_province }}&{% endif %}{% if selected_school_type %}school_type={{ selected_school_type }}&{% endif %}{% if selected_department %}department={{ selected_department }}&{% endif %}page=1">&laquo; 首页</a></li>
+                        <li><a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_province %}province={{ selected_province }}&{% endif %}{% if selected_school_type %}school_type={{ selected_school_type }}&{% endif %}{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ universities.previous_page_number }}">上一页</a></li>
+                    {% else %}
+                        <li class="disabled"><span>&laquo; 首页</span></li>
+                        <li class="disabled"><span>上一页</span></li>
+                    {% endif %}
+                    
+                    {% for i in universities.paginator.page_range %}
+                        {% if universities.number == i %}
+                            <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                        {% elif i > universities.number|add:'-5' and i < universities.number|add:'5' %}
+                            <li><a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_province %}province={{ selected_province }}&{% endif %}{% if selected_school_type %}school_type={{ selected_school_type }}&{% endif %}{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if universities.has_next %}
+                        <li><a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_province %}province={{ selected_province }}&{% endif %}{% if selected_school_type %}school_type={{ selected_school_type }}&{% endif %}{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ universities.next_page_number }}">下一页</a></li>
+                        <li><a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if selected_province %}province={{ selected_province }}&{% endif %}{% if selected_school_type %}school_type={{ selected_school_type }}&{% endif %}{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ universities.paginator.num_pages }}">末页 &raquo;</a></li>
+                    {% else %}
+                        <li class="disabled"><span>下一页</span></li>
+                        <li class="disabled"><span>末页 &raquo;</span></li>
+                    {% endif %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-light" style="padding: 30px 0; margin-top: 50px; background-color: #333; color: white;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>联系我们</h4>
+                    <p>客服电话：400-123-4567</p>
+                    <p>服务时间：9:00-21:00</p>
+                </div>
+                <div class="col-md-4">
+                    <h4>合作伙伴</h4>
+                    <p>教育部阳光高考平台</p>
+                    <p>中国教育在线</p>
+                </div>
+                <div class="col-md-4">
+                    <h4>关注我们</h4>
+                    <p>
+                        <i class="fab fa-weixin fa-2x" style="margin-right: 15px;"></i>
+                        <i class="fab fa-weibo fa-2x" style="margin-right: 15px;"></i>
+                        <i class="fab fa-qq fa-2x"></i>
+                    </p>
+                </div>
+            </div>
+            <div class="text-center" style="margin-top: 20px">
+                <p>&copy; 高考志愿通 版权所有</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="../static/js/jquery-3.2.1.js"></script>
+    <script src="../static/js/bootstrap.js"></script>
+    
+    <script>
+        // 设置筛选器并提交表单
+        function setFilter(filterName, value) {
+            document.getElementById(filterName + '-filter').value = value;
+            document.getElementById('filter-form').submit();
+        }
+    </script>
+</body>
+</html>
+```
