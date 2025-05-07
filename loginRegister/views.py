@@ -6,15 +6,6 @@ from django.contrib import messages
 import mysql.connector
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-# 数据库连接信息
-DB_SCORE = {
-    'host': 'localhost',  # 数据库地址（本地/远程）
-    'user': 'root',  # 数据库用户名
-    'password': '123456',  # 数据库密码
-    'database': 'score',  # 数据库名
-    'charset': 'utf8mb4',  # 设定编码，防止中文乱码
-}
-
 def index(request):
     user = None
     if request.session.get('is_authenticated'):
@@ -187,6 +178,7 @@ def search_universities(request):
         province = request.GET.get('province', '')
         school_type = request.GET.get('school_type', '')
         department = request.GET.get('department', '')
+        characteristics = request.GET.getlist('characteristics')  # 获取多选的院校特色
 
         # 基础SQL查询
         sql = "SELECT * FROM 所有院校信息 WHERE 1=1"
@@ -208,6 +200,18 @@ def search_universities(request):
         if department:
             sql += " AND nature = %s"
             params.append(department)
+
+        if characteristics:
+            char_conditions = []
+            for char in characteristics:
+                if char == '985':
+                    char_conditions.append("is985 = '是'")
+                elif char == '211':
+                    char_conditions.append("is211 = '是'")
+                elif char == '双一流':
+                    char_conditions.append("isdoubleFC = '是'")
+            if char_conditions:
+                sql += " AND (" + " AND ".join(char_conditions) + ")"
 
         # 排序
         sql += " ORDER BY school_name"
@@ -246,6 +250,7 @@ def search_universities(request):
             'selected_province': province,
             'selected_school_type': school_type,
             'selected_department': department,
+            'selected_characteristics': characteristics,
             'user': user,
         }
 

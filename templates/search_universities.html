@@ -68,11 +68,18 @@
         th {
             background-color: #f5f5f5;
         }
+        .checkbox-group {
+            margin-top: 10px;
+        }
+        .checkbox-group label {
+            margin-right: 20px;
+            font-weight: normal;
+        }
     </style>
 </head>
 {% load static %}
 <body>
-    
+    <!-- 导航栏 -->
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -181,6 +188,16 @@
                             {% endfor %}
                         </div>
                     </div>
+                
+                    <!-- 院校特色筛选 -->
+                    <div class="form-group">
+                        <label><strong>院校特色：</strong></label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="characteristics" value="985" {% if '985' in selected_characteristics %}checked{% endif %} onchange="this.form.submit()"> 985</label>
+                            <label><input type="checkbox" name="characteristics" value="211" {% if '211' in selected_characteristics %}checked{% endif %} onchange="this.form.submit()"> 211</label>
+                            <label><input type="checkbox" name="characteristics" value="双一流" {% if '双一流' in selected_characteristics %}checked{% endif %} onchange="this.form.submit()"> 双一流</label>
+                        </div>
+                    </div>
                     
                     <!-- 隐藏字段保存当前选中的筛选值 -->
                     <input type="hidden" name="province" id="province-filter" value="{{ selected_province }}">
@@ -234,7 +251,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="6" class="text-center">没有找到符合条件的高校</td>
+                                <td colspan="7" class="text-center">没有找到符合条件的高校</td>
                             </tr>
                         {% endfor %}
                     </tbody>
