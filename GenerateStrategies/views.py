@@ -81,8 +81,6 @@ def input_info(request):
         request.session.flush()
         return redirect('/login')
 
-
-
     if request.method == 'POST':
         # 获取用户的输入数据
         user_score = int(request.POST.get('score'))  # 确保用户分数是整数
@@ -105,11 +103,12 @@ def input_info(request):
             with connection.cursor() as cursor:
                 # SQL 查询：获取专业分数线数据
                 query = f"""
-                    SELECT school_name, major, province,
+                    SELECT t1.school_name, major, t1.province,
                     ROUND(AVG(min_score),2) AS avg_score,
                     ROUND(AVG(lowest_rank),2) AS avg_rank,
                     sub_req, is985, is211, isdoubleFC
-                    FROM {table_name} NATURAL JOIN `所有院校信息`
+                    FROM {table_name} AS t1 JOIN `所有院校信息` AS t2
+                    ON t1.school_name = t2.school_name
                     GROUP BY school_name, major, province, sub_req, is985, is211, isdoubleFC
                     ORDER BY avg_score DESC;
                 """
@@ -206,17 +205,7 @@ def input_info(request):
                 }
                 category_data.append(school_info)
             grouped_schools[category] = category_data  # 结构：{'冲': [学校1, 学校2...], ...}
-        '''
-        print("分类数据预览：")
-        for category in ['可冲击', '较稳妥', '可保底']:
-            print(f"{category}类院校数量：", len(grouped_schools.get(category, [])))
 
-        print("grouped_schools类型:", type(grouped_schools))  # 应为dict
-        print("grouped_schools键:", grouped_schools.keys())  # 应包含'冲','稳','保'
-
-        print("冲类院校示例:", grouped_schools['可冲击'][0]['name'])  # 应输出学校名称
-        print("首个学校专业数:", len(grouped_schools['可冲击'][0]['majors']))  # 应>0
-        '''
         return render(request, 'recommendations.html', {
             'grouped_schools': grouped_schools,
             'user_score': user_score,
@@ -225,11 +214,19 @@ def input_info(request):
                 '较稳妥': wen_range,
                 '可保底': bao_range
             },
-            'categories': ['可冲击', '较稳妥', '可保底']  # 新增分类列表
+            'categories': ['可冲击', '较稳妥', '可保底'],  # 新增分类列表
+            'user': user,
         })
 
-    return render(request, 'input_info.html', {'user_data': user_data})
+    return render(request, 'input_info.html', {'user_data': user_data,'user': user})
 
 def recommendations(request):
-    recommend_msg = "推荐信息"
-    return render(request, 'recommendations.html', {'login_msg': recommend_msg})
+    if not request.session.get('is_authenticated'):
+        return redirect('/login')
+    user_id = request.session.get('user_id')
+    try:
+        user = RegisterUser.objects.get(id=user_id)
+    except RegisterUser.DoesNotExist:
+        request.session.flush()
+        return redirect('/login')
+    return render(request, 'recommendations.html', {'user': user})
