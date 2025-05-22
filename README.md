@@ -11,7 +11,7 @@
 
     新建查询，使用命令：
     UPDATE `（湖北）一分一段表` SET subject1='历史类' WHERE subject1='历史';
-    否则不能查询湖北省历史类的分数线
+    将“历史”改成“历史类”，否则不能查询湖北省历史类的分数线
 
     先新建register_info数据库，再使用命令：
     python manage.py makemigrations
@@ -21,3 +21,4 @@
 
 ### 其他注意事项
     若一分一段表显示中文乱码，需要将bypart.js保存为utf-8格式
+    bypart是一分一段表页面

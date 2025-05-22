@@ -75,7 +75,7 @@ def bypart(request):
         except RegisterUser.DoesNotExist:
             # 如果用户不存在，清除会话
             request.session.flush()
-    return render(request,'bypart.html', {'user': user})
+    return render(request, 'bypart.html', {'user': user})
 
 def get_scores(request):
     data = list(YFYDTable.objects.all().values(
