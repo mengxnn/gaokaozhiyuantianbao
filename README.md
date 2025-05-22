@@ -1,3 +1,9 @@
+### 开发环境：
+    pycharm版本：2023.3.7
+    bootstrap版本：3.3.7（bootstrap3需要依赖jquery）
+    数据库相关：mysql 8.0，navicat 16
+    Django版本：5.1.6，更新版本应该不影响使用
+
 ### 本地mysql配置：
     用户名：root
     端口号：3306
